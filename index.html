@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -957,6 +957,7 @@
         
         // Initialize Supabase Client
         let supabaseClient = null;
+        let newsDatabase = [];
         
         async function initSupabase() {
             const { createClient } = window.supabase;
@@ -979,7 +980,7 @@
                     .order('created_at', { ascending: false });
                 
                 if (error) {
-                    console.error('❌ Error fetching from Supabase:', error);
+                    console.error('Error fetching from Supabase:', error);
                     return newsDatabase;
                 }
                 
@@ -1003,7 +1004,7 @@
                 
                 return newsDatabase;
             } catch (error) {
-                console.error('❌ Error:', error);
+                console.error('Error:', error);
                 return newsDatabase;
             }
         }
@@ -1039,7 +1040,7 @@
                 .on('postgres_changes',
                     { event: 'UPDATE', schema: 'public', table: 'news' },
                     (payload) => {
-                        console.log('📝 Article updated:', payload.new);
+                        console.log('Article updated:', payload.new);
                         const index = newsDatabase.findIndex(n => n.id === payload.new.id);
                         if (index !== -1) {
                             newsDatabase[index] = {
@@ -1062,7 +1063,7 @@
                 .on('postgres_changes',
                     { event: 'DELETE', schema: 'public', table: 'news' },
                     (payload) => {
-                        console.log('🗑️ Article deleted:', payload.old);
+                        console.log('Article deleted:', payload.old);
                         newsDatabase = newsDatabase.filter(n => n.id !== payload.old.id);
                         renderAll();
                     }
