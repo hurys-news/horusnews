@@ -864,14 +864,13 @@
             }
 
             .article-meta-bar {
-                margin: 10px 0 25px;
-                padding-bottom: 10px;
-               border-bottom: 1px solid #eee;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
             }
 
             .article-date-time {
-                font-size: 14px;
-				color: #666;
+                gap: 10px;
             }
 
             .container,
@@ -1185,12 +1184,19 @@
                                     </div>
                                 </div>
                                                             
-                            <img src="image.jpg" class="article-featured-image" alt="">
-							<div class="article-meta-bar">
-							     <div class="article-date-time">
-								     <span>نشر في: الثلاثاء 13 يناير 2026 · 3 دقائق قراءة</span>
-								</div>
-                            </div>								
+                            <div class="article-meta-bar">
+                                <div class="article-date-time">
+                                    <span><i class="far fa-calendar-alt"></i> نشر في: ${fullDate}، ${formatTime(article.created_at)}</span>
+                                    <span class="reading-time"><i class="far fa-clock"></i> ${calculateReadingTime(article.content || article.summary)} دقائق للقراءة</span>
+                                </div>
+                                <div class="article-stats">
+                                    <div class="stat-item">
+                                        <i class="far fa-eye"></i>
+                                        <span>${formatNumber(article.views || 0)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         
                         ${article.image_url ? `<img src="${article.image_url}" alt="${article.title}" class="article-featured-image" onerror="this.style.display='none'">` : ''}
                         
