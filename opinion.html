@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="حورس نيوز - مقالات الرأي">
+    <title>حورس نيوز - مقالات الرأي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Supabase -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', Arial, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background: linear-gradient(135deg, #C9A227 0%, #A68A1F 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .opinion-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .opinion-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .opinion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .opinion-image {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            background: #ddd;
+        }
+
+        .opinion-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .opinion-content {
+            padding: 25px;
+        }
+
+        .opinion-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .opinion-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #C9A227;
+            font-weight: 600;
+        }
+
+        .opinion-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #999;
+        }
+
+        .opinion-title {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin: 15px 0;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
+
+        .opinion-summary {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .opinion-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .read-more {
+            color: #C9A227;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .read-more:hover {
+            text-decoration: underline;
+        }
+
+        .opinion-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Navigation */
+        nav {
+            background: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #C9A227;
+        }
+
+        /* Footer */
+        footer {
+            background: #1a1a1a;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 10px 0;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 24px;
+            }
+
+            .opinion-title {
+                font-size: 20px;
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .opinion-image {
+                height: 200px;
+            }
+
+            .opinion-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>مقالات الرأي</h1>
+        <p>آراء متنوعة من كتاب وخبراء في السياسة والاقتصاد والثقافة</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="index.html"><i class="fas fa-home"></i> الرئيسية</a></li>
+            <li><a href="index.html#politics"><i class="fas fa-newspaper"></i> الأخبار</a></li>
+            <li><a href="opinion.html"><i class="fas fa-comment"></i> الآراء</a></li>
+            <li><a href="gallery.html"><i class="fas fa-images"></i> الصور</a></li>
+            <li><a href="videos.html"><i class="fas fa-video"></i> الفيديو</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <div class="opinion-grid" id="opinionGrid">
+            <!-- Articles will be loaded here -->
+        </div>
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-inbox"></i>
+            <h2>لا توجد مقالات حالياً</h2>
+            <p>يرجى العودة لاحقاً</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2024 حورس نيوز. جميع الحقوق محفوظة.</p>
+        <p>منصة إخبارية عربية رائدة تقدم أحدث الأخبار والتحليلات</p>
+    </footer>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://qtmdbrvrjdcxkmserlto.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0bWRicnZyamRjeGttc2VybHRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTYzNTgsImV4cCI6MjA4MzgzMjM1OH0.AMsYTEy5Bo_9bcz1YDmeav1Q9qQGLxZBD26KSheAn78';
+        
+        let supabaseClient = null;
+        let opinionsData = [];
+
+        async function initSupabase() {
+            const { createClient } = window.supabase;
+            supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase Initialized');
+        }
+
+        async function fetchOpinionArticles() {
+            if (!supabaseClient) await initSupabase();
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('news')
+                    .select('*')
+                    .eq('category', 'opinion')
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error fetching opinion articles:', error);
+                    return [];
+                }
+                
+                if (data && data.length > 0) {
+                    opinionsData = data;
+                    renderOpinionArticles();
+                } else {
+                    document.getElementById('opinionGrid').style.display = 'none';
+                    document.getElementById('emptyState').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function formatDate(date) {
+            const d = new Date(date);
+            const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 
+                          'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num;
+        }
+
+        function renderOpinionArticles() {
+            const grid = document.getElementById('opinionGrid');
+            
+            if (opinionsData.length === 0) {
+                grid.style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                return;
+            }
+            
+            grid.innerHTML = opinionsData.map(article => `
+                <div class="opinion-card" onclick="openArticle(${article.id})">
+                    <div class="opinion-image">
+                        <img src="${article.image_url}" alt="${article.title}" loading="lazy">
+                    </div>
+                    <div class="opinion-content">
+                        <div class="opinion-meta">
+                            <div class="opinion-author">
+                                <i class="fas fa-user-edit"></i>
+                                <span>${article.author || 'فريق التحرير'}</span>
+                            </div>
+                            <div class="opinion-date">
+                                <i class="far fa-calendar"></i>
+                                <span>${formatDate(article.created_at)}</span>
+                            </div>
+                        </div>
+                        <h2 class="opinion-title">${article.title}</h2>
+                        <p class="opinion-summary">${article.summary}</p>
+                        <div class="opinion-footer">
+                            <a href="#" class="read-more">اقرأ المزيد <i class="fas fa-arrow-left"></i></a>
+                            <div class="opinion-stats">
+                                <div class="stat">
+                                    <i class="far fa-eye"></i>
+                                    <span>${formatNumber(article.views || 0)}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openArticle(id) {
+            window.location.href = `article.html?id=${id}`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Initializing Opinion Page...');
+            await initSupabase();
+            await fetchOpinionArticles();
+            console.log('Opinion Page Ready!');
+        });
+    </script>
+</body>
+</html>
