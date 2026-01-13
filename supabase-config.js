@@ -401,4 +401,4 @@ window.HorusDB = {
     supabase
 };
 
-console.log('🦅 Horus News - Supabase Connected!');
+console.log('Horus News - Supabase Connected!');
