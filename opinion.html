@@ -415,14 +415,117 @@
         }
 
         function openArticle(id) {
-            window.location.href = `article.html?id=${id}`;
+            window.location.href = `opinion.html?id=${id}`;
         }
 
+        // Get article ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const articleId = urlParams.get('id') ? parseInt(urlParams.get('id')) : null;
+        
+        // Load single article if ID is provided
+        async function loadSingleArticle() {
+            if (!articleId) {
+                // No ID, show list of articles
+                await fetchOpinionArticles();
+                return;
+            }
+            
+            if (!supabaseClient) await initSupabase();
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('news')
+                    .select('*')
+                    .eq('id', articleId)
+                    .eq('category', 'opinion')
+                    .single();
+                
+                if (error || !data) {
+                    console.error('Error fetching article:', error);
+                    document.getElementById('opinionGrid').innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <h2>المقال غير موجود</h2>
+                            <p>عذراً، لم يتم العثور على المقال المطلوب</p>
+                            <a href="opinion.html" style="display:inline-block;margin-top:20px;padding:10px 20px;background:#C9A227;color:white;border-radius:5px;text-decoration:none;">العودة إلى مقالات الرأي</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Render single article
+                const article = data;
+                document.getElementById('opinionGrid').innerHTML = `
+                    <div style="background:white;border-radius:8px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="margin-bottom:20px;">
+                            <a href="opinion.html" style="color:#C9A227;text-decoration:none;display:inline-flex;align-items:center;gap:8px;margin-bottom:20px;">
+                                <i class="fas fa-arrow-right"></i> العودة إلى مقالات الرأي
+                            </a>
+                        </div>
+                        <div class="opinion-meta" style="margin-bottom:20px;">
+                            <div class="opinion-author-section">
+                                <img class="opinion-author-avatar" src="https://ui-avatars.com/api/?name=${encodeURIComponent(article.author || 'كاتب')}&background=C9A227&color=fff&size=100" alt="${article.author}">
+                                <div class="opinion-author-info">
+                                    <div class="opinion-author">${article.author || 'فريق التحرير'}</div>
+                                    <div class="opinion-author-title">كاتب ومحلل</div>
+                                </div>
+                            </div>
+                            <div class="opinion-date">
+                                <i class="far fa-calendar"></i>
+                                <span>${formatDate(article.created_at)}</span>
+                            </div>
+                        </div>
+                        <h1 style="font-family:'Noto Kufi Arabic',sans-serif;font-size:32px;font-weight:700;margin-bottom:20px;color:#1a1a1a;line-height:1.4;">${article.title}</h1>
+                        <img src="${article.image_url}" alt="${article.title}" style="width:100%;max-height:400px;object-fit:cover;border-radius:8px;margin-bottom:20px;" onerror="this.style.display='none'">
+                        <div style="font-size:18px;line-height:2;color:#333;font-family:'IBM Plex Sans Arabic',sans-serif;">
+                            ${article.content || article.summary || ''}
+                        </div>
+                        <div style="margin-top:30px;padding-top:20px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;">
+                            <div class="opinion-stats">
+                                <div class="stat">
+                                    <i class="far fa-eye"></i>
+                                    <span>${formatNumber(article.views || 0)} مشاهدة</span>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:10px;">
+                                <button onclick="shareOnFacebook()" style="width:40px;height:40px;border-radius:50%;background:#1877F2;color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fab fa-facebook-f"></i>
+                                </button>
+                                <button onclick="shareOnTwitter()" style="width:40px;height:40px;border-radius:50%;background:#1DA1F2;color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fab fa-twitter"></i>
+                                </button>
+                                <button onclick="shareOnWhatsApp()" style="width:40px;height:40px;border-radius:50%;background:#25D366;color:white;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+                                    <i class="fab fa-whatsapp"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Update page title
+                document.title = `${article.title} - حورس نيوز`;
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        function shareOnFacebook() {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+        
+        function shareOnTwitter() {
+            window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+        
+        function shareOnWhatsApp() {
+            window.open(`https://wa.me/?text=${encodeURIComponent(window.location.href)}`, '_blank');
+        }
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Initializing Opinion Page...');
             await initSupabase();
-            await fetchOpinionArticles();
+            await loadSingleArticle();
             console.log('Opinion Page Ready!');
         });
     </script>

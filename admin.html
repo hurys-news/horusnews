@@ -469,6 +469,7 @@
                                 <div class="form-group">
                                     <label>التصنيف</label>
                                     <select class="form-control" id="newsCategory"></select>
+                                    <input type="hidden" id="isOpinionMode" value="false">
                                 </div>
                                 <div class="form-group">
                                     <label>الكاتب</label>
@@ -628,7 +629,7 @@
             <div id="articles-sectionTab" class="tab-content">
                 <div class="page-header">
                     <div class="page-title"><h1>مقالات الرأي</h1><p>مقالات الرأي والتحليل من كتاب الموقع</p></div>
-                    <button class="btn btn-primary" onclick="showTab('add-article'); document.getElementById('isArticle').checked = true;"><i class="fas fa-plus"></i> مقال جديد</button>
+                    <button class="btn btn-primary" onclick="showTabForOpinion()"><i class="fas fa-plus"></i> مقال جديد</button>
                 </div>
                 <div class="card">
                     <div class="card-header"><h3 class="card-title"><i class="fas fa-pen-fancy"></i> مقالات الرأي</h3></div>
@@ -1085,7 +1086,18 @@
             
             if (tab === 'dashboard') renderDashboard();
             else if (tab === 'articles') renderArticles();
-            else if (tab === 'add-article') resetForm();
+            else if (tab === 'add-article') {
+                resetForm();
+                // إذا كان في وضع مقالات الرأي، إعادة تعيين القائمة المنسدلة
+                const isOpinionMode = document.getElementById('isOpinionMode')?.value === 'true';
+                if (isOpinionMode) {
+                    populateCategoryDropdowns();
+                    const opinionCategory = categoriesData.find(c => c.id === 'opinion');
+                    if (opinionCategory) {
+                        document.getElementById('newsCategory').value = 'opinion';
+                    }
+                }
+            }
             else if (tab === 'categories') renderCategories();
             else if (tab === 'articles-section') renderArticlesSection();
             else if (tab === 'videos') renderVideos();
@@ -1095,8 +1107,6 @@
             else if (tab === 'pages') loadPageContent();
             else if (tab === 'social') loadSocialLinks();
             else if (tab === 'subscribers') renderSubscribers();
-            else if (tab === 'articles-section') renderArticlesSection();
-            else if (tab === 'videos') renderVideos();
         }
 
         function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
@@ -1124,9 +1134,31 @@
         }
 
         function populateCategoryDropdowns() {
-            const options = categoriesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            const isOpinionMode = document.getElementById('isOpinionMode')?.value === 'true';
+            let options;
+            if (isOpinionMode) {
+                // في وضع مقالات الرأي، إظهار تصنيف "مقال الرأي" فقط
+                const opinionCategory = categoriesData.find(c => c.id === 'opinion');
+                options = opinionCategory ? `<option value="${opinionCategory.id}">${opinionCategory.name}</option>` : '';
+            } else {
+                // في الوضع العادي، إظهار جميع التصنيفات
+                options = categoriesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            }
             document.getElementById('newsCategory').innerHTML = options;
-            document.getElementById('filterCat').innerHTML = '<option value="">كل التصنيفات</option>' + options;
+            document.getElementById('filterCat').innerHTML = '<option value="">كل التصنيفات</option>' + categoriesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+        }
+        
+        function showTabForOpinion() {
+            document.getElementById('isOpinionMode').value = 'true';
+            document.getElementById('formTitle').textContent = 'إضافة مقال رأي جديد';
+            document.getElementById('formSubtitle').textContent = 'إنشاء مقال رأي جديد ونشره';
+            showTab('add-article');
+            populateCategoryDropdowns();
+            // تحديد تصنيف "مقال الرأي" تلقائياً
+            const opinionCategory = categoriesData.find(c => c.id === 'opinion');
+            if (opinionCategory) {
+                document.getElementById('newsCategory').value = 'opinion';
+            }
         }
 
         // ==================== إدارة الأخبار ====================
@@ -1161,19 +1193,27 @@
         function filterArticles() { renderArticles(); }
 
         function resetForm() {
-            document.getElementById('formTitle').textContent = 'إضافة خبر جديد';
-            document.getElementById('formSubtitle').textContent = 'إنشاء خبر جديد ونشره';
-            document.getElementById('saveBtnText').textContent = 'نشر الخبر';
+            const isOpinionMode = document.getElementById('isOpinionMode')?.value === 'true';
+            if (!isOpinionMode) {
+                document.getElementById('formTitle').textContent = 'إضافة خبر جديد';
+                document.getElementById('formSubtitle').textContent = 'إنشاء خبر جديد ونشره';
+                document.getElementById('saveBtnText').textContent = 'نشر الخبر';
+            }
             document.getElementById('editingId').value = '';
             document.getElementById('newsTitle').value = '';
             document.getElementById('newsSummary').value = '';
             document.getElementById('newsContent').innerHTML = '';
-            document.getElementById('newsCategory').value = categoriesData[0]?.id || 'politics';
+            const defaultCategory = isOpinionMode ? 'opinion' : (categoriesData[0]?.id || 'politics');
+            document.getElementById('newsCategory').value = defaultCategory;
             document.getElementById('newsAuthor').value = 'فريق التحرير';
             document.getElementById('newsImage').value = '';
             document.getElementById('isBreaking').checked = false;
             document.getElementById('isFeatured').checked = false;
             document.getElementById('imagePreview').innerHTML = '<i class="fas fa-image"></i>';
+            // إعادة تعيين وضع مقالات الرأي عند إلغاء التعديل
+            if (!isOpinionMode) {
+                document.getElementById('isOpinionMode').value = 'false';
+            }
         }
 
         function editNews(id) {
@@ -1750,7 +1790,18 @@
             
             if (tab === 'dashboard') renderDashboard();
             else if (tab === 'articles') renderArticles();
-            else if (tab === 'add-article') resetForm();
+            else if (tab === 'add-article') {
+                resetForm();
+                // إذا كان في وضع مقالات الرأي، إعادة تعيين القائمة المنسدلة
+                const isOpinionMode = document.getElementById('isOpinionMode')?.value === 'true';
+                if (isOpinionMode) {
+                    populateCategoryDropdowns();
+                    const opinionCategory = categoriesData.find(c => c.id === 'opinion');
+                    if (opinionCategory) {
+                        document.getElementById('newsCategory').value = 'opinion';
+                    }
+                }
+            }
             else if (tab === 'categories') renderCategories();
             else if (tab === 'articles-section') renderArticlesSection();
             else if (tab === 'videos') renderVideos();

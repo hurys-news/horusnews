@@ -1450,7 +1450,12 @@
 
         // Go to article
         function goToArticle(id) {
-            window.location.href = `article.html?id=${id}`;
+            const article = newsDatabase.find(n => n.id === id);
+            if (article && (article.category === 'opinion' || article.isArticle)) {
+                window.location.href = `opinion.html?id=${id}`;
+            } else {
+                window.location.href = `article.html?id=${id}`;
+            }
         }
 
         // Share functions

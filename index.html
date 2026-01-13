@@ -1489,7 +1489,14 @@
         }
 
         // Navigation
-        function openArticle(id) { window.location.href = `article.html?id=${id}`; }
+        function openArticle(id) {
+            const article = newsDatabase.find(n => n.id === id);
+            if (article && (article.category === 'opinion' || article.isArticle)) {
+                window.location.href = `opinion.html?id=${id}`;
+            } else {
+                window.location.href = `article.html?id=${id}`;
+            }
+        }
         function toggleMobileMenu() { document.getElementById('navList').classList.toggle('active'); }
         function handleSearch(e) {
             if (e.key === 'Enter') {
