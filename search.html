@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتائج البحث - حورس نيوز</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Supabase -->
+    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #C9A227;
+            --primary-dark: #A68A1F;
+            --accent: #1a1a2e;
+            --red: #BB1919;
+            --bg-light: #f4f4f4;
+            --bg-white: #FFFFFF;
+            --text-dark: #1A1A1A;
+            --text-gray: #555;
+            --text-light: #888;
+            --border: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans Arabic', sans-serif; background: var(--bg-light); color: var(--text-dark); line-height: 1.7; }
+        h1,h2,h3,h4 { font-family: 'Noto Kufi Arabic', sans-serif; }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        .header {
+            background: var(--bg-white);
+            border-bottom: 3px solid var(--primary);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+        .header .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 22px;
+        }
+        .logo-text h1 { font-size: 22px; color: var(--primary-dark); }
+        .logo-text span { font-size: 10px; color: var(--text-light); letter-spacing: 2px; }
+        
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 8px;
+            font-family: inherit; font-weight: 600; transition: all 0.3s;
+            background: var(--accent); color: white; border: none; cursor: pointer;
+        }
+        .btn:hover { background: var(--primary); }
+
+        .search-page { padding: 40px 0; }
+        
+        .search-header {
+            background: linear-gradient(135deg, var(--accent), #252545);
+            padding: 40px 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: white;
+        }
+        .search-header h1 { font-size: 28px; margin-bottom: 20px; }
+        .search-header h1 i { color: var(--primary); }
+        
+        .search-form {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto;
+            gap: 10px;
+        }
+        .search-form input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 16px;
+        }
+        .search-form input:focus { outline: none; }
+        .search-form button {
+            padding: 15px 30px;
+            background: var(--primary);
+            color: var(--accent);
+            border: none;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .search-form button:hover { background: var(--primary-dark); }
+        
+        .search-info {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-gray);
+            font-size: 16px;
+        }
+        .search-info strong { color: var(--primary); }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+        .result-card-image {
+            position: relative;
+            height: 180px;
+            overflow: hidden;
+        }
+        .result-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .result-card:hover .result-card-image img { transform: scale(1.05); }
+        .result-card-category {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .result-card-content { padding: 20px; }
+        .result-card-content h3 {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .result-card-content h3 mark {
+            background: var(--primary);
+            color: white;
+            padding: 0 3px;
+            border-radius: 3px;
+        }
+        .result-card-excerpt {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.7;
+            margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .result-card-excerpt mark {
+            background: #fff3cd;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+        .result-card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .result-card-meta i { margin-left: 5px; }
+        
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-white);
+            border-radius: 15px;
+        }
+        .no-results i { font-size: 60px; color: var(--text-light); margin-bottom: 20px; }
+        .no-results h3 { font-size: 22px; margin-bottom: 10px; }
+        .no-results p { color: var(--text-gray); }
+        
+        .footer {
+            background: var(--accent);
+            color: white;
+            padding: 30px 0;
+            margin-top: 40px;
+            text-align: center;
+        }
+        .footer p { opacity: 0.7; font-size: 14px; }
+        
+        @media (max-width: 768px) {
+            .search-form { flex-direction: column; }
+            .search-form button { width: 100%; }
+            .results-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fas fa-eye"></i></div>
+                <div class="logo-text">
+                    <h1>حورس نيوز</h1>
+                    <span>HORUS NEWS</span>
+                </div>
+            </a>
+            <a href="index.html" class="btn"><i class="fas fa-home"></i> الرئيسية</a>
+        </div>
+    </header>
+
+    <main class="search-page">
+        <div class="container">
+            <div class="search-header">
+                <h1><i class="fas fa-search"></i> البحث في الأخبار</h1>
+                <form class="search-form" onsubmit="performSearch(event)">
+                    <input type="text" id="searchInput" placeholder="ابحث في العناوين والمحتوى..." autofocus>
+                    <button type="submit"><i class="fas fa-search"></i> بحث</button>
+                </form>
+            </div>
+            
+            <div id="searchInfo" class="search-info" style="display: none;"></div>
+            
+            <div id="resultsContainer"></div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 حورس نيوز. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://qtmdbrvrjdcxkmserlto.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0bWRicnZyamRjeGttc2VybHRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTYzNTgsImV4cCI6MjA4MzgzMjM1OH0.AMsYTEy5Bo_9bcz1YDmeav1Q9qQGLxZBD26KSheAn78';
+        
+        // Initialize Supabase Client
+        let supabaseClient = null;
+        
+        async function initSupabase() {
+            const { createClient } = window.supabase;
+            supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase Initialized');
+        }
+        
+        // Fetch news from Supabase
+        async function fetchNewsFromSupabase() {
+            if (!supabaseClient) await initSupabase();
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('news')
+                    .select('*')
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('❌ Error fetching from Supabase:', error);
+                    return newsDatabase;
+                }
+                
+                if (data && data.length > 0) {
+                    // Convert Supabase data to our format
+                    newsDatabase = data.map(item => ({
+                        id: item.id,
+                        title: item.title,
+                        category: item.category,
+                        image: item.image_url,
+                        summary: item.summary,
+                        content: item.content,
+                        date: item.created_at,
+                        views: item.views || 0,
+                        isBreaking: item.is_breaking || false,
+                        isFeatured: item.is_featured || false,
+                        author: item.author || 'فريق التحرير'
+                    }));
+                    console.log('Fetched ' + newsDatabase.length + ' news from Supabase');
+                }
+                
+                return newsDatabase;
+            } catch (error) {
+                console.error('❌ Error:', error);
+                return newsDatabase;
+            }
+        }
+
+        let newsDatabase = JSON.parse(localStorage.getItem('newsDatabase')) || [];
+        let categoriesData = JSON.parse(localStorage.getItem('categoriesData')) || [
+            { id: 'politics', name: 'سياسة' },
+            { id: 'economy', name: 'اقتصاد' },
+            { id: 'sports', name: 'رياضة' },
+            { id: 'tech', name: 'تكنولوجيا' },
+            { id: 'culture', name: 'ثقافة وفن' },
+            { id: 'health', name: 'صحة' },
+            { id: 'world', name: 'عالمي' }
+        ];
+
+        function getCategoryName(id) {
+            const cat = categoriesData.find(c => c.id === id);
+            return cat ? cat.name : id;
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            if (minutes < 1) return 'الآن';
+            if (minutes < 60) return `منذ ${minutes} دقيقة`;
+            if (hours < 24) return `منذ ${hours} ساعة`;
+            if (days < 7) return `منذ ${days} يوم`;
+            return date.toLocaleDateString('ar-EG');
+        }
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function highlightText(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(`(${query})`, 'gi');
+            return text.replace(regex, '<mark>$1</mark>');
+        }
+
+        function stripHtml(html) {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html;
+            return tmp.textContent || tmp.innerText || '';
+        }
+
+        function performSearch(e) {
+            if (e) e.preventDefault();
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            if (!query) {
+                document.getElementById('resultsContainer').innerHTML = '';
+                document.getElementById('searchInfo').style.display = 'none';
+                return;
+            }
+
+            // Search in title, summary, content, and author
+            const results = newsDatabase.filter(news => {
+                const title = (news.title || '').toLowerCase();
+                const summary = (news.summary || '').toLowerCase();
+                const content = stripHtml(news.content || '').toLowerCase();
+                const author = (news.author || '').toLowerCase();
+                
+                return title.includes(query) || 
+                       summary.includes(query) || 
+                       content.includes(query) || 
+                       author.includes(query);
+            });
+
+            // Update URL
+            const url = new URL(window.location);
+            url.searchParams.set('q', query);
+            window.history.pushState({}, '', url);
+
+            displayResults(results, query);
+        }
+
+        function displayResults(results, query) {
+            const container = document.getElementById('resultsContainer');
+            const info = document.getElementById('searchInfo');
+            
+            info.style.display = 'block';
+            info.innerHTML = `تم العثور على <strong>${results.length}</strong> نتيجة للبحث عن "<strong>${query}</strong>"`;
+
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-search"></i>
+                        <h3>لا توجد نتائج</h3>
+                        <p>لم يتم العثور على أخبار تطابق بحثك. جرب كلمات مختلفة.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="results-grid">
+                    ${results.map(news => {
+                        const excerpt = stripHtml(news.content || news.summary || '').substring(0, 150);
+                        return `
+                            <div class="result-card" onclick="window.location.href='article.html?id=${news.id}'">
+                                <div class="result-card-image">
+                                    <img src="${news.image}" alt="${news.title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=400'">
+                                    <span class="result-card-category">${getCategoryName(news.category)}</span>
+                                </div>
+                                <div class="result-card-content">
+                                    <h3>${highlightText(news.title, query)}</h3>
+                                    <p class="result-card-excerpt">${highlightText(excerpt, query)}...</p>
+                                    <div class="result-card-meta">
+                                        <span><i class="far fa-clock"></i> ${formatDate(news.date)}</span>
+                                        <span><i class="far fa-eye"></i> ${formatNumber(news.views || 0)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // Check for query in URL on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('Initializing Search Page...');
+            await initSupabase();
+            await fetchNewsFromSupabase();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const query = urlParams.get('q');
+            if (query) {
+                document.getElementById('searchInput').value = query;
+                performSearch();
+            }
+            console.log('Search Page Ready!');
+        });
+    </script>
+</body>
+</html>

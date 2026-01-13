@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معرض الصور - حورس نيوز</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Supabase -->
+    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #C9A227;
+            --primary-dark: #A68A1F;
+            --accent: #1a1a2e;
+            --bg-light: #f4f4f4;
+            --bg-white: #FFFFFF;
+            --text-dark: #1A1A1A;
+            --text-gray: #555;
+            --border: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans Arabic', sans-serif; background: var(--bg-light); color: var(--text-dark); line-height: 1.7; }
+        h1,h2,h3,h4 { font-family: 'Noto Kufi Arabic', sans-serif; }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 15px; }
+
+        .header {
+            background: var(--bg-white);
+            border-bottom: 3px solid var(--primary);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+        .header .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 22px;
+        }
+        .logo-text h1 { font-size: 22px; color: var(--primary-dark); }
+        .logo-text span { font-size: 10px; color: #888; letter-spacing: 2px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 8px;
+            font-family: inherit; font-weight: 600; transition: all 0.3s;
+            background: var(--accent); color: white; border: none; cursor: pointer;
+        }
+        .btn:hover { background: var(--primary); }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--accent), #252545);
+            padding: 50px 0;
+            text-align: center;
+            color: white;
+        }
+        .page-header h1 { font-size: 36px; margin-bottom: 10px; }
+        .page-header h1 i { color: var(--primary); }
+        .page-header p { opacity: 0.8; font-size: 16px; }
+
+        .gallery-filters {
+            background: var(--bg-white);
+            padding: 20px;
+            border-radius: 10px;
+            margin: -30px auto 30px;
+            max-width: 800px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 10px 25px;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding: 20px 0 50px;
+        }
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 1;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+        .gallery-item:hover { transform: scale(1.03); }
+        .gallery-item.wide { grid-column: span 2; aspect-ratio: 2/1; }
+        .gallery-item.tall { grid-row: span 2; aspect-ratio: 1/2; }
+        .gallery-item img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .gallery-item:hover img { transform: scale(1.1); }
+        .gallery-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex; flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
+        .gallery-overlay h3 { color: white; font-size: 16px; margin-bottom: 5px; }
+        .gallery-overlay span { color: var(--primary); font-size: 13px; }
+        .gallery-zoom {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 60px; height: 60px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 24px;
+            transition: transform 0.3s;
+        }
+        .gallery-item:hover .gallery-zoom { transform: translate(-50%, -50%) scale(1); }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.95);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .lightbox.active { display: flex; }
+        .lightbox-content {
+            max-width: 90%; max-height: 90%;
+            position: relative;
+        }
+        .lightbox-content img {
+            max-width: 100%; max-height: 85vh;
+            border-radius: 10px;
+        }
+        .lightbox-caption {
+            text-align: center;
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+        }
+        .lightbox-close {
+            position: absolute; top: 20px; right: 20px;
+            background: none; border: none;
+            color: white; font-size: 40px;
+            cursor: pointer; transition: color 0.3s;
+        }
+        .lightbox-close:hover { color: var(--primary); }
+        .lightbox-nav {
+            position: absolute; top: 50%;
+            transform: translateY(-50%);
+            background: var(--primary);
+            border: none; color: white;
+            width: 50px; height: 50px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .lightbox-nav:hover { background: white; color: var(--primary); }
+        .lightbox-nav.prev { left: 20px; }
+        .lightbox-nav.next { right: 20px; }
+
+        .footer {
+            background: var(--accent); color: white;
+            padding: 30px 0; text-align: center;
+        }
+        .footer p { opacity: 0.7; font-size: 14px; }
+
+        @media (max-width: 992px) {
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .gallery-item.wide, .gallery-item.tall { grid-column: span 1; grid-row: span 1; aspect-ratio: 1; }
+            .page-header h1 { font-size: 28px; }
+            .lightbox-nav { width: 40px; height: 40px; font-size: 16px; }
+        }
+        @media (max-width: 480px) {
+            .gallery-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+        <button class="lightbox-nav prev" onclick="changeImage(-1)"><i class="fas fa-chevron-right"></i></button>
+        <div class="lightbox-content">
+            <img id="lightboxImg" src="" alt="">
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+        </div>
+        <button class="lightbox-nav next" onclick="changeImage(1)"><i class="fas fa-chevron-left"></i></button>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fas fa-eye"></i></div>
+                <div class="logo-text">
+                    <h1>حورس نيوز</h1>
+                    <span>HORUS NEWS</span>
+                </div>
+            </a>
+            <a href="index.html" class="btn"><i class="fas fa-home"></i> الرئيسية</a>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-images"></i> معرض الصور</h1>
+            <p>أحدث الصور والألبومات المصورة</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="gallery-filters">
+            <button class="filter-btn active" onclick="filterGallery('all')">الكل</button>
+            <button class="filter-btn" onclick="filterGallery('politics')">سياسة</button>
+            <button class="filter-btn" onclick="filterGallery('sports')">رياضة</button>
+            <button class="filter-btn" onclick="filterGallery('culture')">ثقافة</button>
+            <button class="filter-btn" onclick="filterGallery('world')">عالمي</button>
+        </div>
+
+        <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 حورس نيوز. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // بيانات الصور
+        const galleryData = [
+            { id: 1, src: 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800', title: 'قمة القادة العرب', category: 'politics', wide: true },
+            { id: 2, src: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800', title: 'نهائي دوري الأبطال', category: 'sports' },
+            { id: 3, src: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800', title: 'افتتاح المتحف الكبير', category: 'culture', tall: true },
+            { id: 4, src: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800', title: 'مؤتمر الاقتصاد العالمي', category: 'world' },
+            { id: 5, src: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800', title: 'مؤتمر التكنولوجيا', category: 'world' },
+            { id: 6, src: 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800', title: 'احتفالات الفوز', category: 'sports', wide: true },
+            { id: 7, src: 'https://images.unsplash.com/photo-1569163139599-0f4517e36f51?w=800', title: 'قمة المناخ', category: 'world' },
+            { id: 8, src: 'https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?w=800', title: 'إطلاق القمر الصناعي', category: 'world' },
+            { id: 9, src: 'https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=800', title: 'مهرجان السينما', category: 'culture' },
+            { id: 10, src: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800', title: 'حفل الجوائز', category: 'culture' },
+            { id: 11, src: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800', title: 'التتويج بالكأس', category: 'sports' },
+            { id: 12, src: 'https://images.unsplash.com/photo-1575540325276-ff2c22f16c2a?w=800', title: 'جلسة البرلمان', category: 'politics' },
+        ];
+
+        let currentFilter = 'all';
+        let currentIndex = 0;
+        let filteredImages = [...galleryData];
+
+        function renderGallery() {
+            filteredImages = currentFilter === 'all' 
+                ? galleryData 
+                : galleryData.filter(img => img.category === currentFilter);
+            
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = filteredImages.map((img, index) => `
+                <div class="gallery-item ${img.wide ? 'wide' : ''} ${img.tall ? 'tall' : ''}" onclick="openLightbox(${index})">
+                    <img src="${img.src}" alt="${img.title}" loading="lazy">
+                    <div class="gallery-zoom"><i class="fas fa-search-plus"></i></div>
+                    <div class="gallery-overlay">
+                        <h3>${img.title}</h3>
+                        <span><i class="fas fa-camera"></i> حورس نيوز</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterGallery(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderGallery();
+        }
+
+        function openLightbox(index) {
+            currentIndex = index;
+            updateLightbox();
+            document.getElementById('lightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function updateLightbox() {
+            const img = filteredImages[currentIndex];
+            document.getElementById('lightboxImg').src = img.src;
+            document.getElementById('lightboxCaption').textContent = img.title;
+        }
+
+        function changeImage(dir) {
+            currentIndex = (currentIndex + dir + filteredImages.length) % filteredImages.length;
+            updateLightbox();
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('lightbox').classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') changeImage(1);
+            if (e.key === 'ArrowRight') changeImage(-1);
+        });
+
+        // Initialize
+        renderGallery();
+    </script>
+</body>
+</html>

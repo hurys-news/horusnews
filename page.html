@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حورس نيوز</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Supabase -->
+    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #C9A227;
+            --primary-dark: #A68A1F;
+            --accent: #1a1a2e;
+            --red: #BB1919;
+            --bg-light: #f4f4f4;
+            --bg-white: #FFFFFF;
+            --text-dark: #1A1A1A;
+            --text-gray: #555;
+            --border: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans Arabic', sans-serif; background: var(--bg-light); color: var(--text-dark); line-height: 1.8; }
+        h1,h2,h3,h4 { font-family: 'Noto Kufi Arabic', sans-serif; }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        .header {
+            background: var(--bg-white);
+            border-bottom: 4px solid var(--primary);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+        .header .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 24px;
+        }
+        .logo-text h1 { font-size: 24px; color: var(--primary-dark); }
+        .logo-text span { font-size: 11px; color: #888; letter-spacing: 2px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 8px;
+            background: var(--accent); color: white;
+            font-family: inherit; font-weight: 600; transition: all 0.3s;
+        }
+        .btn:hover { background: var(--primary); }
+
+        .page-hero {
+            background: linear-gradient(135deg, var(--accent), #252545);
+            color: white; padding: 60px 0; text-align: center;
+        }
+        .page-hero h1 { font-size: 36px; margin-bottom: 10px; }
+        .page-hero p { opacity: 0.8; font-size: 16px; }
+
+        .page-content {
+            background: var(--bg-white);
+            max-width: 900px;
+            margin: -40px auto 40px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        .page-content h2 { color: var(--primary-dark); margin: 30px 0 15px; font-size: 24px; }
+        .page-content p { margin-bottom: 15px; color: var(--text-gray); }
+        .page-content ul { margin: 15px 0; padding-right: 30px; }
+        .page-content li { margin-bottom: 10px; color: var(--text-gray); }
+
+        .contact-form { margin-top: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .form-control {
+            width: 100%; padding: 15px;
+            border: 2px solid var(--border); border-radius: 10px;
+            font-family: inherit; font-size: 15px; transition: border-color 0.3s;
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); }
+        textarea.form-control { min-height: 150px; resize: vertical; }
+        .submit-btn {
+            padding: 15px 40px; background: var(--primary); color: white;
+            border: none; border-radius: 10px; font-family: inherit;
+            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s;
+        }
+        .submit-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        .contact-info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        .contact-box {
+            background: var(--bg-light); padding: 25px; border-radius: 12px; text-align: center;
+        }
+        .contact-box i { font-size: 30px; color: var(--primary); margin-bottom: 15px; }
+        .contact-box h4 { margin-bottom: 8px; }
+        .contact-box p { color: var(--text-gray); font-size: 14px; }
+
+        .footer {
+            background: var(--accent); color: white; padding: 30px 0; text-align: center;
+        }
+        .footer p { opacity: 0.7; font-size: 14px; }
+
+        @media (max-width: 768px) {
+            .page-hero h1 { font-size: 28px; }
+            .page-content { margin: -20px 15px 30px; padding: 25px; }
+            .contact-info { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fas fa-eye"></i></div>
+                <div class="logo-text">
+                    <h1>حورس نيوز</h1>
+                    <span>HORUS NEWS</span>
+                </div>
+            </a>
+            <a href="index.html" class="btn"><i class="fas fa-home"></i> الرئيسية</a>
+        </div>
+    </header>
+
+    <section class="page-hero">
+        <div class="container">
+            <h1 id="pageTitle">جاري التحميل...</h1>
+            <p id="pageSubtitle"></p>
+        </div>
+    </section>
+
+    <main class="page-content" id="pageContent">
+        <p>جاري تحميل المحتوى...</p>
+    </main>
+
+    <div id="contactFormSection" style="display:none;">
+        <div class="page-content">
+            <div class="contact-info">
+                <div class="contact-box">
+                    <i class="fas fa-envelope"></i>
+                    <h4>البريد الإلكتروني</h4>
+                    <p>info@horusnews.com</p>
+                </div>
+                <div class="contact-box">
+                    <i class="fas fa-phone"></i>
+                    <h4>الهاتف</h4>
+                    <p>+20 123 456 789</p>
+                </div>
+                <div class="contact-box">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h4>العنوان</h4>
+                    <p>القاهرة، مصر</p>
+                </div>
+            </div>
+            <form class="contact-form" onsubmit="submitContact(event)">
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" class="form-control" placeholder="أدخل اسمك..." required>
+                </div>
+                <div class="form-group">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" class="form-control" placeholder="أدخل بريدك الإلكتروني..." required>
+                </div>
+                <div class="form-group">
+                    <label>الموضوع</label>
+                    <input type="text" class="form-control" placeholder="موضوع الرسالة..." required>
+                </div>
+                <div class="form-group">
+                    <label>الرسالة</label>
+                    <textarea class="form-control" placeholder="اكتب رسالتك هنا..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> إرسال الرسالة</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 حورس نيوز. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        const pagesData = JSON.parse(localStorage.getItem('pagesData')) || {
+            about: { title: 'من نحن', content: '<h2>عن حورس نيوز</h2><p>حورس نيوز منصة إخبارية عربية رائدة تأسست بهدف تقديم محتوى إخباري موثوق وشامل للقارئ العربي.</p><h2>رؤيتنا</h2><p>نسعى لأن نكون المصدر الأول والأكثر موثوقية للأخبار في العالم العربي.</p><h2>قيمنا</h2><ul><li>المصداقية والشفافية</li><li>الحياد والموضوعية</li><li>السرعة والدقة</li><li>احترام القارئ</li></ul>' },
+            contact: { title: 'اتصل بنا', content: '<h2>تواصل معنا</h2><p>نحن سعداء بتواصلكم معنا. يمكنكم الاتصال بنا عبر أي من الوسائل التالية أو من خلال نموذج الاتصال أدناه.</p>' },
+            privacy: { title: 'سياسة الخصوصية', content: '<h2>سياسة الخصوصية</h2><p>نحن في حورس نيوز نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية.</p><h2>جمع المعلومات</h2><p>نقوم بجمع المعلومات التي تقدمها لنا طوعاً مثل البريد الإلكتروني عند الاشتراك في النشرة الإخبارية.</p><h2>استخدام المعلومات</h2><p>نستخدم المعلومات المجمعة لتحسين خدماتنا وإرسال التحديثات الإخبارية.</p><h2>حماية المعلومات</h2><p>نتخذ إجراءات أمنية مناسبة لحماية بياناتك من الوصول غير المصرح به.</p>' }
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageId = urlParams.get('p') || 'about';
+
+        function loadPage() {
+            const page = pagesData[pageId];
+            if (page) {
+                document.getElementById('pageTitle').textContent = page.title;
+                document.getElementById('pageContent').innerHTML = page.content;
+                document.title = page.title + ' - حورس نيوز';
+                
+                if (pageId === 'contact') {
+                    document.getElementById('contactFormSection').style.display = 'block';
+                }
+            } else {
+                document.getElementById('pageTitle').textContent = 'الصفحة غير موجودة';
+                document.getElementById('pageContent').innerHTML = '<p>عذراً، الصفحة المطلوبة غير موجودة.</p>';
+            }
+        }
+
+        function submitContact(e) {
+            e.preventDefault();
+            alert('شكراً لتواصلك معنا! سنرد عليك في أقرب وقت.');
+            e.target.reset();
+        }
+
+        loadPage();
+    </script>
+</body>
+</html>

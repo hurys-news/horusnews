@@ -1,0 +1,8 @@
+# Netlify Redirects for Horus News
+
+# Clean URLs
+/admin    /admin.html    200
+/article  /article.html  200
+
+# 404 fallback
+/*        /index.html    404

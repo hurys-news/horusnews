@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار Supabase - حورس نيوز</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans Arabic', sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #C9A227, #A68A1F);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .status-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #999;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .status-card.success {
+            border-left-color: #27ae60;
+        }
+
+        .status-card.error {
+            border-left-color: #e74c3c;
+        }
+
+        .status-card.info {
+            border-left-color: #3498db;
+        }
+
+        .status-card h3 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .status-card .value {
+            font-size: 13px;
+            color: #666;
+            word-break: break-all;
+            font-family: monospace;
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+
+        .status-icon {
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        .success .status-icon { color: #27ae60; }
+        .error .status-icon { color: #e74c3c; }
+        .info .status-icon { color: #3498db; }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-bottom: 2px solid #C9A227;
+            padding-bottom: 10px;
+        }
+
+        .news-item {
+            border: 1px solid #eee;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            background: #f9f9f9;
+        }
+
+        .news-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .news-item h4 {
+            font-family: 'Noto Kufi Arabic', sans-serif;
+            color: #1a1a2e;
+            margin-bottom: 5px;
+        }
+
+        .news-item p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .news-item .meta {
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #C9A227, #A68A1F);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #C9A227;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 5px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #f5c6cb;
+        }
+
+        .alert.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #bee5eb;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🦅 اختبار تكامل Supabase - حورس نيوز</h1>
+            <p>تحقق من اتصال قاعدة البيانات والبيانات</p>
+        </div>
+
+        <div class="status-grid" id="statusGrid"></div>
+
+        <div class="section">
+            <h2>📝 الأخبار من Supabase</h2>
+            <div id="newsContainer" style="min-height: 100px; display: flex; align-items: center; justify-content: center;">
+                <span class="loading"></span> جاري التحميل...
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>⚙️ الإجراءات</h2>
+            <button onclick="testConnection()">🔌 اختبار الاتصال</button>
+            <button onclick="refreshNews()">🔄 تحديث الأخبار</button>
+            <button onclick="clearCache()">🗑️ مسح الذاكرة</button>
+            <button onclick="openConsole()">📋 فتح Console</button>
+        </div>
+
+        <div class="section">
+            <h2>📖 الإرشادات</h2>
+            <p>هذه الصفحة تختبر الاتصال بـ Supabase وتعرض البيانات:</p>
+            <ul style="margin: 15px 0 0 20px;">
+                <li>✅ حالة الاتصال بـ Supabase</li>
+                <li>✅ عدد الأخبار المتاحة</li>
+                <li>✅ قائمة بأحدث الأخبار</li>
+                <li>✅ معلومات الأخطاء (إن وجدت)</li>
+            </ul>
+            <p style="margin-top: 15px; font-size: 13px; color: #666;">
+                إذا رأيت أخطاء، افتح <code>Developer Tools (F12)</code> وتحقق من رسائل الخطأ في <code>Console</code>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://qtmdbrvrjdcxkmserlto.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0bWRicnZyamRjeGttc2VybHRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTYzNTgsImV4cCI6MjA4MzgzMjM1OH0.AMsYTEy5Bo_9bcz1YDmeav1Q9qQGLxZBD26KSheAn78';
+
+        let supabaseClient = null;
+        let testResults = {
+            supabaseLoaded: false,
+            supabaseConnected: false,
+            newsCount: 0,
+            error: null
+        };
+
+        async function initSupabase() {
+            try {
+                console.log('🔌 جاري تهيئة Supabase...');
+                
+                // Check if Supabase library is loaded
+                if (!window.supabase) {
+                    throw new Error('مكتبة Supabase لم تحمل بعد');
+                }
+
+                testResults.supabaseLoaded = true;
+                const { createClient } = window.supabase;
+                supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+                // Test connection
+                const { data, error } = await supabaseClient
+                    .from('news')
+                    .select('id')
+                    .limit(1);
+
+                if (error) throw error;
+
+                testResults.supabaseConnected = true;
+                console.log('Supabase Connection Success!');
+
+                // Fetch all news
+                await fetchNews();
+                updateStatus();
+
+            } catch (error) {
+                testResults.error = error.message;
+                console.error('❌ خطأ في Supabase:', error);
+                updateStatus();
+            }
+        }
+
+        async function fetchNews() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('news')
+                    .select('*')
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                testResults.newsCount = data?.length || 0;
+                displayNews(data || []);
+                console.log(`Fetched ${data?.length || 0} news`);
+
+            } catch (error) {
+                testResults.error = error.message;
+                console.error('❌ خطأ في جلب الأخبار:', error);
+                document.getElementById('newsContainer').innerHTML = `
+                    <div class="alert error">
+                        ❌ خطأ في جلب البيانات: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function displayNews(news) {
+            const container = document.getElementById('newsContainer');
+            if (news.length === 0) {
+                container.innerHTML = '<div class="alert info">لا توجد أخبار منشورة حالياً</div>';
+                return;
+            }
+
+            container.innerHTML = news.slice(0, 5).map(n => `
+                <div class="news-item">
+                    <h4>#${n.id} - ${n.title}</h4>
+                    <p><strong>التصنيف:</strong> ${n.category}</p>
+                    <p><strong>الكاتب:</strong> ${n.author || 'فريق التحرير'}</p>
+                    <div class="meta">
+                        <span>📅 ${new Date(n.created_at).toLocaleDateString('ar-EG')}</span>
+                        <span style="margin-right: 15px;">👁️ ${n.views || 0} مشاهدة</span>
+                        <span style="margin-right: 15px;">🔴 عاجل: ${n.is_breaking ? 'نعم' : 'لا'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStatus() {
+            const grid = document.getElementById('statusGrid');
+            const status = [
+                {
+                    title: '📚 مكتبة Supabase',
+                    value: testResults.supabaseLoaded ? '✅ محملة' : '❌ لم تحمل',
+                    class: testResults.supabaseLoaded ? 'success' : 'error'
+                },
+                {
+                    title: '🔌 اتصال Supabase',
+                    value: testResults.supabaseConnected ? '✅ متصل' : '❌ غير متصل',
+                    class: testResults.supabaseConnected ? 'success' : 'error'
+                },
+                {
+                    title: '📰 عدد الأخبار',
+                    value: `${testResults.newsCount} أخبار`,
+                    class: testResults.newsCount > 0 ? 'success' : 'info'
+                }
+            ];
+
+            if (testResults.error) {
+                status.push({
+                    title: '❌ الخطأ',
+                    value: testResults.error,
+                    class: 'error'
+                });
+            }
+
+            grid.innerHTML = status.map(s => `
+                <div class="status-card ${s.class}">
+                    <h3><span class="status-icon">●</span> ${s.title}</h3>
+                    <div class="value">${s.value}</div>
+                </div>
+            `).join('');
+        }
+
+        function testConnection() {
+            initSupabase();
+        }
+
+        function refreshNews() {
+            if (!supabaseClient) {
+                alert('يجب الاتصال بـ Supabase أولاً');
+                return;
+            }
+            document.getElementById('newsContainer').innerHTML = '<span class="loading"></span> جاري التحديث...';
+            fetchNews();
+        }
+
+        function clearCache() {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('✅ تم مسح الذاكرة');
+        }
+
+        function openConsole() {
+            console.log('='.repeat(50));
+            console.log('🦅 حورس نيوز - Supabase Test Console');
+            console.log('='.repeat(50));
+            console.log('📊 النتائج:', testResults);
+            console.log('📚 Supabase Client:', supabaseClient);
+            console.log('='.repeat(50));
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            console.log('Loading test page...');
+            initSupabase();
+        });
+    </script>
+</body>
+</html>

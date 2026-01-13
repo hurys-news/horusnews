@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة الفيديو - حورس نيوز</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Supabase -->
+    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #C9A227;
+            --primary-dark: #A68A1F;
+            --accent: #1a1a2e;
+            --red: #e74c3c;
+            --bg-light: #f4f4f4;
+            --bg-white: #FFFFFF;
+            --text-dark: #1A1A1A;
+            --text-gray: #555;
+            --border: #e0e0e0;
+            --shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'IBM Plex Sans Arabic', sans-serif; background: var(--bg-light); color: var(--text-dark); line-height: 1.7; }
+        h1,h2,h3,h4 { font-family: 'Noto Kufi Arabic', sans-serif; }
+        a { text-decoration: none; color: inherit; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 15px; }
+
+        .header {
+            background: var(--bg-white);
+            border-bottom: 3px solid var(--primary);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+        .header .container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { display: flex; align-items: center; gap: 10px; }
+        .logo-icon {
+            width: 45px; height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 22px;
+        }
+        .logo-text h1 { font-size: 22px; color: var(--primary-dark); }
+        .logo-text span { font-size: 10px; color: #888; letter-spacing: 2px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border-radius: 8px;
+            font-family: inherit; font-weight: 600; transition: all 0.3s;
+            background: var(--accent); color: white; border: none; cursor: pointer;
+        }
+        .btn:hover { background: var(--primary); }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--accent), #252545);
+            padding: 50px 0;
+            text-align: center;
+            color: white;
+        }
+        .page-header h1 { font-size: 36px; margin-bottom: 10px; }
+        .page-header h1 i { color: var(--red); }
+        .page-header p { opacity: 0.8; font-size: 16px; }
+
+        .video-filters {
+            background: var(--bg-white);
+            padding: 20px;
+            border-radius: 10px;
+            margin: -30px auto 30px;
+            max-width: 900px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .filter-btn {
+            padding: 10px 25px;
+            border: 2px solid var(--border);
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--red);
+            border-color: var(--red);
+            color: white;
+        }
+
+        .featured-video {
+            background: var(--bg-white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        .featured-video-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0;
+        }
+        .featured-main {
+            position: relative;
+            aspect-ratio: 16/9;
+            cursor: pointer;
+        }
+        .featured-main img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+        }
+        .featured-play {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px; height: 80px;
+            background: var(--red);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 30px;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(231,76,60,0.4);
+        }
+        .featured-main:hover .featured-play {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: white;
+            color: var(--red);
+        }
+        .featured-info {
+            padding: 25px;
+            background: var(--accent);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .featured-badge {
+            display: inline-block;
+            background: var(--red);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            width: fit-content;
+        }
+        .featured-info h2 { font-size: 22px; margin-bottom: 15px; line-height: 1.5; }
+        .featured-info p { opacity: 0.8; font-size: 14px; line-height: 1.7; margin-bottom: 15px; }
+        .featured-meta { display: flex; gap: 20px; font-size: 13px; opacity: 0.7; }
+        .featured-meta i { margin-left: 5px; }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            padding-bottom: 50px;
+        }
+        .video-card {
+            background: var(--bg-white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        .video-thumb {
+            position: relative;
+            aspect-ratio: 16/9;
+        }
+        .video-thumb img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+        .video-card:hover .video-thumb img { transform: scale(1.05); }
+        .video-play {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px; height: 50px;
+            background: var(--red);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 18px;
+            transition: all 0.3s;
+            opacity: 0.9;
+        }
+        .video-card:hover .video-play {
+            transform: translate(-50%, -50%) scale(1.1);
+            opacity: 1;
+        }
+        .video-duration {
+            position: absolute;
+            bottom: 10px; left: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .video-category {
+            position: absolute;
+            top: 10px; right: 10px;
+            background: var(--primary);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .video-content { padding: 15px; }
+        .video-content h3 {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .video-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+        .video-meta i { margin-left: 4px; }
+
+        /* Video Modal */
+        .video-modal {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.95);
+            display: none; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .video-modal.active { display: flex; }
+        .video-modal-content {
+            width: 90%;
+            max-width: 1000px;
+        }
+        .video-modal-content iframe {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border: none;
+            border-radius: 10px;
+        }
+        .video-modal-close {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: none; border: none;
+            color: white; font-size: 40px;
+            cursor: pointer;
+        }
+        .video-modal-close:hover { color: var(--red); }
+
+        .footer {
+            background: var(--accent); color: white;
+            padding: 30px 0; text-align: center;
+        }
+        .footer p { opacity: 0.7; font-size: 14px; }
+
+        @media (max-width: 992px) {
+            .videos-grid { grid-template-columns: repeat(3, 1fr); }
+            .featured-video-container { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .videos-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .page-header h1 { font-size: 28px; }
+            .featured-info h2 { font-size: 18px; }
+        }
+        @media (max-width: 480px) {
+            .videos-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Video Modal -->
+    <div class="video-modal" id="videoModal">
+        <button class="video-modal-close" onclick="closeVideoModal()"><i class="fas fa-times"></i></button>
+        <div class="video-modal-content">
+            <iframe id="videoFrame" src="" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon"><i class="fas fa-eye"></i></div>
+                <div class="logo-text">
+                    <h1>حورس نيوز</h1>
+                    <span>HORUS NEWS</span>
+                </div>
+            </a>
+            <a href="index.html" class="btn"><i class="fas fa-home"></i> الرئيسية</a>
+        </div>
+    </header>
+
+    <div class="page-header">
+        <div class="container">
+            <h1><i class="fas fa-play-circle"></i> مكتبة الفيديو</h1>
+            <p>شاهد أحدث التقارير والفيديوهات الإخبارية</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="video-filters">
+            <button class="filter-btn active" onclick="filterVideos('all')">الكل</button>
+            <button class="filter-btn" onclick="filterVideos('news')">أخبار</button>
+            <button class="filter-btn" onclick="filterVideos('reports')">تقارير</button>
+            <button class="filter-btn" onclick="filterVideos('interviews')">مقابلات</button>
+            <button class="filter-btn" onclick="filterVideos('sports')">رياضة</button>
+            <button class="filter-btn" onclick="filterVideos('documentary')">وثائقي</button>
+        </div>
+
+        <!-- Featured Video -->
+        <div class="featured-video" id="featuredVideo"></div>
+
+        <!-- Videos Grid -->
+        <div class="videos-grid" id="videosGrid"></div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>© 2024 حورس نيوز. جميع الحقوق محفوظة.</p>
+        </div>
+    </footer>
+
+    <script>
+        // بيانات الفيديوهات
+        let videosData = JSON.parse(localStorage.getItem('videosData')) || [
+            { id: 1, title: 'تقرير خاص: مستقبل الطاقة المتجددة في الشرق الأوسط', description: 'تقرير شامل عن مشاريع الطاقة الشمسية والرياح في المنطقة العربية', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800', duration: '12:45', category: 'reports', views: 15000, date: '2024-01-10', featured: true },
+            { id: 2, title: 'لقاء حصري مع وزير الاقتصاد حول الإصلاحات الجديدة', description: 'مقابلة خاصة حول خطط التنمية الاقتصادية', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=800', duration: '18:30', category: 'interviews', views: 12000, date: '2024-01-09' },
+            { id: 3, title: 'ملخص مباراة نهائي دوري أبطال أفريقيا', description: 'أهداف وملخص المباراة النارية', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800', duration: '08:15', category: 'sports', views: 45000, date: '2024-01-08' },
+            { id: 4, title: 'وثائقي: رحلة إلى أعماق البحر الأحمر', description: 'استكشاف الحياة البحرية في البحر الأحمر', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800', duration: '25:00', category: 'documentary', views: 8000, date: '2024-01-07' },
+            { id: 5, title: 'نشرة الأخبار الرئيسية', description: 'آخر التطورات والأحداث', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1495020689067-958852a7765e?w=800', duration: '30:00', category: 'news', views: 22000, date: '2024-01-10' },
+            { id: 6, title: 'تحليل: تداعيات الأزمة الاقتصادية العالمية', description: 'نظرة معمقة على الأسواق المالية', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800', duration: '15:20', category: 'reports', views: 9500, date: '2024-01-06' },
+            { id: 7, title: 'مقابلة مع نجم الكرة المصرية', description: 'حوار خاص عن مسيرته الرياضية', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800', duration: '22:10', category: 'interviews', views: 35000, date: '2024-01-05' },
+            { id: 8, title: 'وثائقي: تاريخ الحضارة المصرية القديمة', description: 'رحلة عبر الزمن إلى عصر الفراعنة', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ', image: 'https://images.unsplash.com/photo-1539768942893-daf53e448371?w=800', duration: '45:00', category: 'documentary', views: 18000, date: '2024-01-04' },
+        ];
+
+        let currentFilter = 'all';
+        const categoryNames = { news: 'أخبار', reports: 'تقارير', interviews: 'مقابلات', sports: 'رياضة', documentary: 'وثائقي' };
+
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('ar-EG');
+        }
+
+        function renderFeatured() {
+            const featured = videosData.find(v => v.featured) || videosData[0];
+            document.getElementById('featuredVideo').innerHTML = `
+                <div class="featured-video-container">
+                    <div class="featured-main" onclick="playVideo('${featured.url}')">
+                        <img src="${featured.image}" alt="${featured.title}">
+                        <div class="featured-play"><i class="fas fa-play"></i></div>
+                    </div>
+                    <div class="featured-info">
+                        <span class="featured-badge"><i class="fas fa-star"></i> فيديو مميز</span>
+                        <h2>${featured.title}</h2>
+                        <p>${featured.description}</p>
+                        <div class="featured-meta">
+                            <span><i class="fas fa-clock"></i> ${featured.duration}</span>
+                            <span><i class="fas fa-eye"></i> ${formatNumber(featured.views)} مشاهدة</span>
+                            <span><i class="fas fa-calendar"></i> ${formatDate(featured.date)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderVideos() {
+            const filtered = currentFilter === 'all' 
+                ? videosData.filter(v => !v.featured)
+                : videosData.filter(v => v.category === currentFilter);
+            
+            document.getElementById('videosGrid').innerHTML = filtered.map(video => `
+                <div class="video-card" onclick="playVideo('${video.url}')">
+                    <div class="video-thumb">
+                        <img src="${video.image}" alt="${video.title}" loading="lazy">
+                        <div class="video-play"><i class="fas fa-play"></i></div>
+                        <span class="video-duration">${video.duration}</span>
+                        <span class="video-category">${categoryNames[video.category] || video.category}</span>
+                    </div>
+                    <div class="video-content">
+                        <h3>${video.title}</h3>
+                        <div class="video-meta">
+                            <span><i class="fas fa-eye"></i> ${formatNumber(video.views)}</span>
+                            <span><i class="fas fa-calendar"></i> ${formatDate(video.date)}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterVideos(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderVideos();
+        }
+
+        function playVideo(url) {
+            document.getElementById('videoFrame').src = url + '?autoplay=1';
+            document.getElementById('videoModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal() {
+            document.getElementById('videoFrame').src = '';
+            document.getElementById('videoModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeVideoModal();
+        });
+
+        // Initialize
+        renderFeatured();
+        renderVideos();
+    </script>
+</body>
+</html>
