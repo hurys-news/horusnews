@@ -268,18 +268,29 @@
             max-width: 900px;
             margin: 0 auto;
             padding: 0;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .article-header-section {
-            padding: 40px 0 30px;
-            border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 30px;
+            padding: 30px 0 20px;
+            margin-bottom: 25px;
         }
 
         .article-breadcrumb {
-            margin-bottom: 20px;
-            font-size: 14px;
-            color: #666;
+            margin-bottom: 25px;
+            font-size: 13px;
+            color: #888;
         }
 
         .article-breadcrumb a {
@@ -299,21 +310,25 @@
         .author-box {
             display: flex;
             align-items: center;
-            gap: 20px;
-            padding: 25px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            margin-bottom: 30px;
-            border-right: 4px solid #C9A227;
+            gap: 15px;
+            padding: 20px 0;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .author-avatar-large {
-            width: 100px;
-            height: 100px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #C9A227;
+            border: 2px solid #e0e0e0;
             flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .author-avatar-large:hover {
+            border-color: #C9A227;
+            transform: scale(1.05);
         }
 
         .author-details {
@@ -321,28 +336,33 @@
         }
 
         .author-name-large {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 700;
-            color: #1a1a1a;
-            margin-bottom: 5px;
+            color: #1a7fb8;
+            margin-bottom: 3px;
             font-family: 'Noto Kufi Arabic', sans-serif;
+            transition: color 0.3s;
+        }
+
+        .author-name-large:hover {
+            color: #C9A227;
         }
 
         .author-bio {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
+            font-size: 13px;
+            color: #888;
+            line-height: 1.5;
         }
 
         .article-title-large {
             font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 42px;
+            font-size: 38px;
             font-weight: 800;
-            line-height: 1.3;
+            line-height: 1.4;
             color: #1a1a1a;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+            padding-bottom: 0;
+            border-bottom: none;
         }
 
         .article-meta-bar {
@@ -351,7 +371,7 @@
             align-items: center;
             padding: 15px 0;
             border-bottom: 1px solid #e0e0e0;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             flex-wrap: wrap;
             gap: 15px;
         }
@@ -359,33 +379,56 @@
         .article-date-time {
             display: flex;
             align-items: center;
-            gap: 15px;
-            font-size: 14px;
-            color: #666;
+            gap: 20px;
+            font-size: 13px;
+            color: #888;
+            flex-wrap: wrap;
         }
 
         .article-date-time i {
-            color: #C9A227;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .article-date-time span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reading-time {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .reading-time i {
+            color: #999;
         }
 
         .article-featured-image {
             width: 100%;
-            max-height: 500px;
+            max-height: 450px;
             object-fit: cover;
-            border-radius: 8px;
-            margin-bottom: 30px;
+            border-radius: 6px;
+            margin-bottom: 35px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .article-content-wrapper {
-            font-size: 20px;
-            line-height: 2.2;
-            color: #333;
+            font-size: 19px;
+            line-height: 2;
+            color: #2c2c2c;
             font-family: 'IBM Plex Sans Arabic', sans-serif;
             margin-bottom: 40px;
+            text-align: justify;
         }
 
         .article-content-wrapper p {
-            margin-bottom: 25px;
+            margin-bottom: 22px;
+            text-indent: 0;
         }
 
         .article-content-wrapper h2 {
@@ -420,8 +463,21 @@
         .article-content-wrapper img {
             max-width: 100%;
             height: auto;
-            border-radius: 8px;
+            border-radius: 6px;
             margin: 30px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .article-content-wrapper a {
+            color: #1a7fb8;
+            text-decoration: none;
+            border-bottom: 1px solid #1a7fb8;
+            transition: all 0.3s;
+        }
+
+        .article-content-wrapper a:hover {
+            color: #C9A227;
+            border-bottom-color: #C9A227;
         }
 
         .article-share-section {
@@ -540,6 +596,26 @@
         }
 
         .stat-item i {
+            color: #999;
+        }
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Selection color */
+        ::selection {
+            background: #C9A227;
+            color: white;
+        }
+
+        ::-moz-selection {
+            background: #C9A227;
+            color: white;
+        }
+
+        .stat-item i {
             color: #C9A227;
         }
 
@@ -575,13 +651,17 @@
             }
 
             .author-box {
-                flex-direction: column;
-                text-align: center;
+                flex-direction: row;
+                text-align: right;
             }
 
             .author-avatar-large {
-                width: 80px;
-                height: 80px;
+                width: 50px;
+                height: 50px;
+            }
+
+            .author-name-large {
+                font-size: 16px;
             }
 
             .article-content-wrapper {
@@ -704,6 +784,17 @@
             return `${hours12}:${minutes.toString().padStart(2, '0')} ${ampm}`;
         }
 
+        function calculateReadingTime(content) {
+            if (!content) return 5;
+            // Remove HTML tags
+            const text = content.replace(/<[^>]*>/g, '');
+            // Average reading speed: 200-250 words per minute in Arabic
+            // We'll use 200 words per minute
+            const words = text.split(/\s+/).length;
+            const minutes = Math.ceil(words / 200);
+            return minutes < 1 ? 1 : minutes;
+        }
+
         function formatNumber(num) {
             if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
             if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
@@ -816,25 +907,25 @@
                                 <span>${article.title.substring(0, 50)}...</span>
                             </div>
                             
+                            <h1 class="article-title-large">${article.title}</h1>
+                            
                             <div class="author-box">
-                                <img class="author-avatar-large" src="https://ui-avatars.com/api/?name=${encodeURIComponent(article.author || 'كاتب')}&background=C9A227&color=fff&size=200" alt="${article.author}">
+                                <img class="author-avatar-large" src="https://ui-avatars.com/api/?name=${encodeURIComponent(article.author || 'كاتب')}&background=1a7fb8&color=fff&size=120" alt="${article.author}">
                                 <div class="author-details">
                                     <div class="author-name-large">${article.author || 'فريق التحرير'}</div>
-                                    <div class="author-bio">كاتب ومحلل سياسي متخصص في الشؤون العربية والدولية</div>
+                                    <div class="author-bio">كاتب ومحلل سياسي</div>
                                 </div>
                             </div>
                             
-                            <h1 class="article-title-large">${article.title}</h1>
-                            
                             <div class="article-meta-bar">
                                 <div class="article-date-time">
-                                    <span><i class="far fa-calendar-alt"></i> ${fullDate}</span>
-                                    <span><i class="far fa-clock"></i> ${formatTime(article.created_at)}</span>
+                                    <span><i class="far fa-calendar-alt"></i> نشر في: ${fullDate}، ${formatTime(article.created_at)}</span>
+                                    <span class="reading-time"><i class="far fa-clock"></i> ${calculateReadingTime(article.content || article.summary)} دقائق للقراءة</span>
                                 </div>
                                 <div class="article-stats">
                                     <div class="stat-item">
                                         <i class="far fa-eye"></i>
-                                        <span>${formatNumber(article.views || 0)} مشاهدة</span>
+                                        <span>${formatNumber(article.views || 0)}</span>
                                     </div>
                                 </div>
                             </div>
