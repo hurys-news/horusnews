@@ -468,10 +468,6 @@
             transition: color 0.3s;
         }
 
-        .author-name-large:hover {
-            color: #C9A227;
-        }
-
         .author-bio {
             font-size: 12px;
             color: #999;
@@ -1187,9 +1183,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <img class="title-author-avatar" src="https://ui-avatars.com/api/?name=${encodeURIComponent(article.author || 'كاتب')}&background=1a7fb8&color=fff&size=120" alt="${article.author}">
-                            </div>
-                            
+                                                            
                             <div class="article-meta-bar">
                                 <div class="article-date-time">
                                     <span><i class="far fa-calendar-alt"></i> نشر في: ${fullDate}، ${formatTime(article.created_at)}</span>
@@ -1364,6 +1358,7 @@
     </script>
 </body>
 </html>
+
 
 
 
