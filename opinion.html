@@ -62,6 +62,8 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
+            display: flex;
+            flex-direction: row-reverse;
         }
 
         .opinion-card:hover {
@@ -70,10 +72,11 @@
         }
 
         .opinion-image {
-            width: 100%;
-            height: 300px;
+            width: 280px;
+            height: 220px;
             overflow: hidden;
             background: #ddd;
+            flex-shrink: 0;
         }
 
         .opinion-image img {
@@ -84,6 +87,10 @@
 
         .opinion-content {
             padding: 25px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .opinion-meta {
@@ -92,17 +99,39 @@
             align-items: center;
             margin-bottom: 15px;
             flex-wrap: wrap;
-            gap: 10px;
-            font-size: 14px;
-            color: #666;
+            gap: 15px;
+        }
+
+        .opinion-author-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .opinion-author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            flex-shrink: 0;
+        }
+
+        .opinion-author-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
         }
 
         .opinion-author {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #C9A227;
             font-weight: 600;
+            color: var(--primary-dark);
+            font-size: 15px;
+        }
+
+        .opinion-author-title {
+            font-size: 12px;
+            color: #999;
         }
 
         .opinion-date {
@@ -110,22 +139,27 @@
             align-items: center;
             gap: 5px;
             color: #999;
+            font-size: 14px;
         }
 
         .opinion-title {
             font-family: 'Noto Kufi Arabic', sans-serif;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            margin: 15px 0;
+            margin: 12px 0;
             color: #1a1a1a;
             line-height: 1.4;
         }
 
         .opinion-summary {
-            font-size: 16px;
-            line-height: 1.6;
+            font-size: 15px;
+            line-height: 1.5;
             color: #555;
             margin-bottom: 15px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .opinion-footer {
@@ -143,6 +177,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            font-size: 14px;
         }
 
         .read-more:hover {
@@ -151,15 +186,15 @@
 
         .opinion-stats {
             display: flex;
-            gap: 20px;
-            font-size: 14px;
+            gap: 15px;
+            font-size: 13px;
             color: #999;
         }
 
         .stat {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
         /* Navigation */
@@ -224,17 +259,22 @@
                 font-size: 24px;
             }
 
+            .opinion-card {
+                flex-direction: column;
+            }
+
+            .opinion-image {
+                width: 100%;
+                height: 200px;
+            }
+
             .opinion-title {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             nav ul {
                 flex-direction: column;
                 gap: 10px;
-            }
-
-            .opinion-image {
-                height: 200px;
             }
 
             .opinion-content {
@@ -346,9 +386,12 @@
                     </div>
                     <div class="opinion-content">
                         <div class="opinion-meta">
-                            <div class="opinion-author">
-                                <i class="fas fa-user-edit"></i>
-                                <span>${article.author || 'فريق التحرير'}</span>
+                            <div class="opinion-author-section">
+                                <img class="opinion-author-avatar" src="https://ui-avatars.com/api/?name=${encodeURIComponent(article.author || 'كاتب')}&background=C9A227&color=fff&size=100" alt="${article.author}">
+                                <div class="opinion-author-info">
+                                    <div class="opinion-author">${article.author || 'فريق التحرير'}</div>
+                                    <div class="opinion-author-title">كاتب ومحلل</div>
+                                </div>
                             </div>
                             <div class="opinion-date">
                                 <i class="far fa-calendar"></i>
