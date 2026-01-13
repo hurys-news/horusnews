@@ -1256,7 +1256,7 @@
         }
 
         function renderBreakingNews() {
-            const breaking = newsDatabase.filter(n => n.isBreaking).map(n => `🔴 ${n.title}`).join('  |  ');
+            const breaking = newsDatabase.filter(n => n.isBreaking).map(n => `[عاجل] ${n.title}`).join('  |  ');
             document.getElementById('breakingTicker').textContent = breaking || 'تابعونا للحصول على آخر الأخبار العاجلة';
         }
 
@@ -1536,9 +1536,14 @@
         document.addEventListener('DOMContentLoaded', async () => {
             console.log('Initializing Horus News...');
             await initSupabase();
-            await fetchNewsFromSupabase();
-            renderAll();
-            console.log('Horus News Ready!');
+            const result = await fetchNewsFromSupabase();
+            console.log('Data loaded:', result.length, 'articles');
+            
+            // Small delay to ensure DOM is ready
+            setTimeout(() => {
+                renderAll();
+                console.log('Horus News Ready!');
+            }, 100);
         });
     </script>
 </body>
