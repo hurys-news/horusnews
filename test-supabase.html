@@ -212,35 +212,35 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🦅 اختبار تكامل Supabase - حورس نيوز</h1>
+            <h1>Horus News - Supabase Integration Test</h1>
             <p>تحقق من اتصال قاعدة البيانات والبيانات</p>
         </div>
 
         <div class="status-grid" id="statusGrid"></div>
 
         <div class="section">
-            <h2>📝 الأخبار من Supabase</h2>
+            <h2>News from Supabase</h2>
             <div id="newsContainer" style="min-height: 100px; display: flex; align-items: center; justify-content: center;">
                 <span class="loading"></span> جاري التحميل...
             </div>
         </div>
 
         <div class="section">
-            <h2>⚙️ الإجراءات</h2>
-            <button onclick="testConnection()">🔌 اختبار الاتصال</button>
-            <button onclick="refreshNews()">🔄 تحديث الأخبار</button>
-            <button onclick="clearCache()">🗑️ مسح الذاكرة</button>
-            <button onclick="openConsole()">📋 فتح Console</button>
+            <h2>Actions</h2>
+            <button onclick="testConnection()">Test Connection</button>
+            <button onclick="refreshNews()">Refresh News</button>
+            <button onclick="clearCache()">Clear Cache</button>
+            <button onclick="openConsole()">Open Console</button>
         </div>
 
         <div class="section">
-            <h2>📖 الإرشادات</h2>
+            <h2>Instructions</h2>
             <p>هذه الصفحة تختبر الاتصال بـ Supabase وتعرض البيانات:</p>
             <ul style="margin: 15px 0 0 20px;">
-                <li>✅ حالة الاتصال بـ Supabase</li>
-                <li>✅ عدد الأخبار المتاحة</li>
-                <li>✅ قائمة بأحدث الأخبار</li>
-                <li>✅ معلومات الأخطاء (إن وجدت)</li>
+                <li>Supabase connection status</li>
+                <li>Number of available news</li>
+                <li>List of latest news</li>
+                <li>Error information (if any)</li>
             </ul>
             <p style="margin-top: 15px; font-size: 13px; color: #666;">
                 إذا رأيت أخطاء، افتح <code>Developer Tools (F12)</code> وتحقق من رسائل الخطأ في <code>Console</code>
@@ -263,7 +263,7 @@
 
         async function initSupabase() {
             try {
-                console.log('🔌 جاري تهيئة Supabase...');
+                console.log('Initializing Supabase...');
                 
                 // Check if Supabase library is loaded
                 if (!window.supabase) {
@@ -335,7 +335,7 @@
                     <p><strong>الكاتب:</strong> ${n.author || 'فريق التحرير'}</p>
                     <div class="meta">
                         <span>📅 ${new Date(n.created_at).toLocaleDateString('ar-EG')}</span>
-                        <span style="margin-right: 15px;">👁️ ${n.views || 0} مشاهدة</span>
+                        <span style="margin-right: 15px;">${n.views || 0} views</span>
                         <span style="margin-right: 15px;">🔴 عاجل: ${n.is_breaking ? 'نعم' : 'لا'}</span>
                     </div>
                 </div>
@@ -347,16 +347,16 @@
             const status = [
                 {
                     title: '📚 مكتبة Supabase',
-                    value: testResults.supabaseLoaded ? '✅ محملة' : '❌ لم تحمل',
+                    value: testResults.supabaseLoaded ? 'Loaded' : 'Not loaded',
                     class: testResults.supabaseLoaded ? 'success' : 'error'
                 },
                 {
-                    title: '🔌 اتصال Supabase',
-                    value: testResults.supabaseConnected ? '✅ متصل' : '❌ غير متصل',
+                    title: 'Supabase Connection',
+                    value: testResults.supabaseConnected ? 'Connected' : 'Not connected',
                     class: testResults.supabaseConnected ? 'success' : 'error'
                 },
                 {
-                    title: '📰 عدد الأخبار',
+                    title: 'News Count',
                     value: `${testResults.newsCount} أخبار`,
                     class: testResults.newsCount > 0 ? 'success' : 'info'
                 }
@@ -394,7 +394,7 @@
         function clearCache() {
             localStorage.clear();
             sessionStorage.clear();
-            alert('✅ تم مسح الذاكرة');
+            alert('Cache cleared');
         }
 
         function openConsole() {
