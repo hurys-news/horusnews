@@ -997,7 +997,8 @@
                         views: item.views || 0,
                         isBreaking: item.is_breaking || false,
                         isFeatured: item.is_featured || false,
-                        author: item.author || 'فريق التحرير'
+                        author: item.author || 'فريق التحرير',
+                        author_image: item.author_image || null
                     }));
                     console.log('Fetched ' + newsDatabase.length + ' news from Supabase');
                 }
@@ -1139,8 +1140,12 @@
             return num.toString();
         }
 
-        const categoryNames = { politics: 'سياسة', economy: 'اقتصاد', sports: 'رياضة', tech: 'تكنولوجيا', culture: 'ثقافة وفن', health: 'صحة', world: 'عالمي', opinion: 'مقالات الرأي' };
-        const categoryIcons = { politics: 'fa-landmark', economy: 'fa-chart-line', sports: 'fa-futbol', tech: 'fa-microchip', culture: 'fa-palette', health: 'fa-heartbeat', world: 'fa-globe', opinion: 'fa-pen-fancy' };
+        let categoryNames = {};
+        let categoryIcons = {};
+        categoriesData.forEach(c => {
+            categoryNames[c.id] = c.name;
+            categoryIcons[c.id] = c.icon;
+        });
         
         // التأكد من وجود تصنيف مقالات الرأي في localStorage
         (function() {
