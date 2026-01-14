@@ -1491,9 +1491,11 @@
         // Navigation
         function openArticle(id) {
             const article = newsDatabase.find(n => n.id === id);
-            if (article && (article.category === 'opinion' || article.isArticle)) {
-                window.location.href = `opinion.html?id=${id}`;
+            if (article && article.category === 'opinion') {
+                // Redirect to opinion page for opinion articles
+                window.location.href = `opinion.html`;
             } else {
+                // Redirect to article page for news articles
                 window.location.href = `article.html?id=${id}`;
             }
         }
