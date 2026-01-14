@@ -551,7 +551,8 @@
                 authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
                 date: "2024-01-15",
                 views: 1250,
-                comments: 24
+                comments: 24,
+                category: "opinion"
             },
             {
                 id: 2,
@@ -562,7 +563,8 @@
                 authorAvatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
                 date: "2024-01-14",
                 views: 890,
-                comments: 18
+                comments: 18,
+                category: "opinion"
             },
             {
                 id: 3,
@@ -573,7 +575,8 @@
                 authorAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
                 date: "2024-01-13",
                 views: 1580,
-                comments: 31
+                comments: 31,
+                category: "opinion"
             },
             {
                 id: 4,
@@ -584,7 +587,8 @@
                 authorAvatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
                 date: "2024-01-12",
                 views: 720,
-                comments: 15
+                comments: 15,
+                category: "opinion"
             },
             {
                 id: 5,
@@ -595,7 +599,8 @@
                 authorAvatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
                 date: "2024-01-11",
                 views: 2100,
-                comments: 42
+                comments: 42,
+                category: "opinion"
             },
             {
                 id: 6,
@@ -606,7 +611,8 @@
                 authorAvatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=face",
                 date: "2024-01-10",
                 views: 1350,
-                comments: 28
+                comments: 28,
+                category: "opinion"
             }
         ];
 
@@ -684,12 +690,174 @@
 
         // Function to view opinion
         function viewOpinion(opinionId) {
-            // Navigate to article page with opinion ID
-            window.location.href = `article.html?id=${opinionId}&type=opinion`;
+            // Navigate to opinion page with opinion ID
+            window.location.href = `opinion.html?id=${opinionId}`;
+        }
+
+        // Function to display single opinion article
+        function displaySingleOpinion(opinionId) {
+            const opinion = sampleOpinions.find(o => o.id === parseInt(opinionId));
+            if (!opinion) {
+                document.getElementById('opinions-container').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-newspaper"></i>
+                        <h3>مقال الرأي غير موجود</h3>
+                        <p>عذراً، لم يتم العثور على المقال المطلوب</p>
+                        <a href="opinion.html" class="read-more" style="display: inline-flex; text-decoration: none; margin-top: 20px;">
+                            العودة لصفحة الآراء
+                            <i class="fas fa-arrow-left" style="margin-right: 8px;"></i>
+                        </a>
+                    </div>
+                `;
+                document.getElementById('opinions-container').style.display = 'block';
+                document.getElementById('loading').style.display = 'none';
+                return;
+            }
+
+            // Update page title
+            document.title = `${opinion.title} - حورس نيوز`;
+
+            // Create detailed opinion article view
+            const container = document.getElementById('opinions-container');
+            container.innerHTML = `
+                <div class="single-opinion-article">
+                    <div class="opinion-header">
+                        <div class="author-section">
+                            <img src="${opinion.authorAvatar}" alt="${opinion.author}" class="single-opinion-author-avatar">
+                            <div class="author-details">
+                                <h2>${opinion.author}</h2>
+                                <p class="author-title">${opinion.authorTitle}</p>
+                                <p class="opinion-date"><i class="far fa-calendar-alt"></i> ${formatArabicDate(opinion.date)}</p>
+                            </div>
+                        </div>
+                        <h1 class="opinion-article-title">${opinion.title}</h1>
+                    </div>
+                    <div class="opinion-content">
+                        <p class="opinion-full-summary">${opinion.summary}</p>
+                        <div class="opinion-full-content">
+                            <p>هذا المحتوى التفصيلي لمقال الرأي. يمكن أن يحتوي على تحليلات معمقة وأراء موضوعية حول القضايا المختلفة في المجتمع العربي والعالم.</p>
+                            <p>الرأي المنشور هنا هو رأي الكاتب الشخصي ولا يعبر بالضرورة عن رأي المنصة.</p>
+                        </div>
+                    </div>
+                    <div class="opinion-stats-bar">
+                        <div class="opinion-stats">
+                            <span class="stat-item">
+                                <i class="far fa-eye"></i>
+                                ${opinion.views.toLocaleString()} مشاهدة
+                            </span>
+                            <span class="stat-item">
+                                <i class="far fa-comment"></i>
+                                ${opinion.comments} تعليق
+                            </span>
+                        </div>
+                        <a href="opinion.html" class="back-to-opinions">
+                            <i class="fas fa-arrow-left"></i>
+                            العودة للآراء
+                        </a>
+                    </div>
+                </div>
+            `;
+
+            // Add styles for single opinion view
+            const style = document.createElement('style');
+            style.textContent = `
+                .single-opinion-article {
+                    max-width: 800px;
+                    margin: 0 auto;
+                    background: white;
+                    border-radius: 15px;
+                    overflow: hidden;
+                    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+                }
+                .opinion-header {
+                    padding: 30px;
+                    text-align: center;
+                    background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
+                }
+                .author-section {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 15px;
+                    margin-bottom: 20px;
+                }
+                .single-opinion-author-avatar {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid var(--primary);
+                    box-shadow: 0 4px 15px rgba(201, 162, 39, 0.2);
+                }
+                .author-details h2 {
+                    font-size: 1.2rem;
+                    color: var(--text-dark);
+                    margin-bottom: 5px;
+                }
+                .opinion-article-title {
+                    font-size: 2rem;
+                    color: var(--text-dark);
+                    margin: 20px 0;
+                    line-height: 1.3;
+                }
+                .opinion-content {
+                    padding: 30px;
+                }
+                .opinion-full-summary {
+                    font-size: 1.2rem;
+                    line-height: 1.8;
+                    color: var(--text-dark);
+                    margin-bottom: 25px;
+                    font-weight: 600;
+                }
+                .opinion-full-content p {
+                    margin-bottom: 20px;
+                    line-height: 1.8;
+                    font-size: 1rem;
+                }
+                .opinion-stats-bar {
+                    padding: 20px 30px;
+                    background: #f9f9f9;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                .opinion-stats {
+                    display: flex;
+                    gap: 20px;
+                }
+                .back-to-opinions {
+                    color: var(--primary);
+                    text-decoration: none;
+                    font-weight: 600;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+                .back-to-opinions:hover {
+                    color: var(--primary-dark);
+                }
+            `;
+            document.head.appendChild(style);
+
+            container.style.display = 'block';
+            document.getElementById('loading').style.display = 'none';
         }
 
         // Load opinions when page loads
-        document.addEventListener('DOMContentLoaded', loadOpinions);
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if there's an opinion ID in the URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const opinionId = urlParams.get('id');
+
+            if (opinionId) {
+                // Display single opinion article
+                displaySingleOpinion(opinionId);
+            } else {
+                // Load opinions grid
+                loadOpinions();
+            }
+        });
 
         // Add smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {

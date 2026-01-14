@@ -229,8 +229,8 @@
             border-radius: 8px;
         }
         .opinion-author-photo {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid var(--primary);
@@ -309,7 +309,6 @@
             max-height: 400px;
             object-fit: cover;
             border-radius: 0;
-            pedding: 130;
         }
 
         .article-content img {
@@ -402,7 +401,7 @@
         }
 
         .share-btn.facebook { background: #1877F2; }
-        .share-btn.twitter { background: #1DA1F2; }
+        .share-btn.twitter { background: #000000; }
         .share-btn.whatsapp { background: #25D366; }
         .share-btn.telegram { background: #0088CC; }
         .share-btn.linkedin { background: #0A66C2; }
@@ -1205,7 +1204,7 @@
         ];
         let socialLinks = JSON.parse(localStorage.getItem('socialLinks')) || {
             facebook: 'https://facebook.com',
-            twitter: 'https://twitter.com',
+            x: 'https://x.com',
             youtube: 'https://youtube.com',
             instagram: 'https://instagram.com'
         };
@@ -1229,7 +1228,7 @@
             if (container) {
                 container.innerHTML = `
                     <a href="${socialLinks.facebook || '#'}" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                    <a href="${socialLinks.twitter || '#'}" target="_blank"><i class="fab fa-twitter"></i></a>
+                    <a href="${socialLinks.x || '#'}" target="_blank"><i class="fab fa-x-twitter"></i></a>
                     <a href="${socialLinks.youtube || '#'}" target="_blank"><i class="fab fa-youtube"></i></a>
                     <a href="${socialLinks.instagram || '#'}" target="_blank"><i class="fab fa-instagram"></i></a>
                 `;
@@ -1300,6 +1299,12 @@
                 return;
             }
 
+            // Redirect opinion articles to opinion page
+            if (article.category === 'opinion') {
+                window.location.href = `opinion.html?id=${articleId}`;
+                return;
+            }
+
             // Update views in local database
             article.views = (article.views || 0) + 1;
             localStorage.setItem('newsDatabase', JSON.stringify(newsDatabase));
@@ -1322,7 +1327,7 @@
                     </span>
                     ${isOpinionArticle ? `
                         <div class="opinion-article-header">
-                            <img class="opinion-author-photo" src="https://ui-avatars.com/api/?name=${encodeURIComponent(article.author || 'كاتب')}&background=C9A227&color=fff&size=200" alt="${article.author}">
+                            <img class="opinion-author-photo" src="https://ui-avatars.com/api/?name=${encodeURIComponent(article.author || 'كاتب')}&background=C9A227&color=fff&size=80" alt="${article.author}">
                             <div class="opinion-author-info">
                                 <div class="author-name"><i class="fas fa-pen-fancy"></i> ${article.author || 'كاتب الرأي'}</div>
                                 <div class="author-title">كاتب ومحلل</div>
@@ -1338,6 +1343,9 @@
                     </div>
                 </div>
                 <img class="article-image" src="${article.image}" alt="${article.title}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800'">
+                <div class="article-image-caption">
+                    <i class="fas fa-camera"></i> صورة توضيحية للخبر
+                </div>
                 <div class="article-content">
                     ${article.content || `<p>${article.summary}</p>`}
                 </div>
@@ -1347,7 +1355,7 @@
                         <button class="share-btn facebook" onclick="share('facebook')" title="فيسبوك">
                             <i class="fab fa-facebook-f"></i>
                         </button>
-                        <button class="share-btn twitter" onclick="share('twitter')" title="X">
+                        <button class="share-btn twitter" onclick="share('x')" title="X">
                             <i class="fab fa-x-twitter"></i>
                         </button>
                         <button class="share-btn whatsapp" onclick="share('whatsapp')" title="واتساب">
@@ -1450,7 +1458,7 @@
         // Go to article
         function goToArticle(id) {
             const article = newsDatabase.find(n => n.id === id);
-            if (article && (article.category === 'opinion' || article.isArticle)) {
+            if (article && article.category === 'opinion') {
                 window.location.href = `opinion.html?id=${id}`;
             } else {
                 window.location.href = `article.html?id=${id}`;
@@ -1461,10 +1469,10 @@
         function share(platform) {
             const url = encodeURIComponent(window.location.href);
             const title = encodeURIComponent(document.title);
-            
+
             const urls = {
                 facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-                twitter: `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
+                x: `https://x.com/intent/tweet?url=${url}&text=${title}`,
                 whatsapp: `https://wa.me/?text=${title}%20${url}`,
                 telegram: `https://t.me/share/url?url=${url}&text=${title}`,
                 linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${url}&title=${title}`
