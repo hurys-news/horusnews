@@ -1140,16 +1140,9 @@
             return num.toString();
         }
 
-        let categoryNames = {};
-        let categoryIcons = {};
-        categoriesData.forEach(c => {
-            categoryNames[c.id] = c.name;
-            categoryIcons[c.id] = c.icon;
-        });
-        
         // التأكد من وجود تصنيف مقالات الرأي في localStorage
         (function() {
-            let categoriesData = JSON.parse(localStorage.getItem('categoriesData')) || [];
+            categoriesData = JSON.parse(localStorage.getItem('categoriesData')) || [];
             if (categoriesData.length === 0) {
                 categoriesData = [
                     { id: 'politics', name: 'سياسة', icon: 'fa-landmark', order: 1 },
@@ -1167,6 +1160,13 @@
                 localStorage.setItem('categoriesData', JSON.stringify(categoriesData));
             }
         })();
+
+        let categoryNames = {};
+        let categoryIcons = {};
+        categoriesData.forEach(c => {
+            categoryNames[c.id] = c.name;
+            categoryIcons[c.id] = c.icon;
+        });
 
         function getCategoryName(cat) { return categoryNames[cat] || cat; }
 
