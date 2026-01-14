@@ -682,12 +682,10 @@
             }, 1500);
         }
 
-        // Function to view opinion (placeholder)
+        // Function to view opinion
         function viewOpinion(opinionId) {
-            // This would typically navigate to a detailed opinion page
-            console.log('Viewing opinion:', opinionId);
-            // For demo purposes, just show an alert
-            alert(`عذراً، صفحة المقال رقم ${opinionId} غير متاحة في النسخة التجريبية`);
+            // Navigate to article page with opinion ID
+            window.location.href = `article.html?id=${opinionId}&type=opinion`;
         }
 
         // Load opinions when page loads
