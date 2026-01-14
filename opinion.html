@@ -604,12 +604,13 @@
                         summary: item.summary,
                         author: item.author || 'كاتب الرأي',
                         authorTitle: 'كاتب ومحلل',
-                        authorAvatar: item.author_image || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+                        authorAvatar: item.author_image || item.image_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.author || 'كاتب')}&background=C9A227&color=fff&size=150`,
                         date: item.created_at,
                         views: item.views || 0,
                         comments: item.comments || 0,
                         category: item.category,
-                        content: item.content
+                        content: item.content,
+                        image_url: item.image_url
                     }));
                 }
 
@@ -809,15 +810,15 @@
             container.innerHTML = `
                 <div class="single-opinion-article">
                     <div class="opinion-header">
+                        <h1 class="opinion-article-title">${opinion.title}</h1>
                         <div class="author-section">
-                            <img src="${opinion.authorAvatar}" alt="${opinion.author}" class="single-opinion-author-avatar">
+                            <img src="${opinion.image_url || opinion.authorAvatar}" alt="${opinion.author}" class="single-opinion-author-avatar">
                             <div class="author-details">
                                 <h2>${opinion.author}</h2>
                                 <p class="author-title">${opinion.authorTitle}</p>
                                 <p class="opinion-date"><i class="far fa-calendar-alt"></i> ${formatArabicDate(opinion.date)}</p>
                             </div>
                         </div>
-                        <h1 class="opinion-article-title">${opinion.title}</h1>
                     </div>
                     <div class="opinion-content">
                         <p class="opinion-full-summary">${opinion.summary}</p>
@@ -864,17 +865,21 @@
                 .author-section {
                     display: flex;
                     align-items: center;
-                    justify-content: center;
+                    justify-content: flex-start;
                     gap: 15px;
-                    margin-bottom: 20px;
+                    margin-top: 20px;
+                    padding: 15px 20px;
+                    background: rgba(201, 162, 39, 0.08);
+                    border-radius: 12px;
+                    border-right: 4px solid var(--primary);
                 }
                 .single-opinion-author-avatar {
-                    width: 40px;
-                    height: 40px;
+                    width: 70px;
+                    height: 70px;
                     border-radius: 50%;
                     object-fit: cover;
-                    border: 2px solid var(--primary);
-                    box-shadow: 0 4px 15px rgba(201, 162, 39, 0.2);
+                    border: 3px solid var(--primary);
+                    box-shadow: 0 4px 15px rgba(201, 162, 39, 0.3);
                 }
                 .author-details h2 {
                     font-size: 1.2rem;
