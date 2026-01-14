@@ -1319,24 +1319,33 @@
             const grid = document.getElementById('opinionArticlesGrid');
             
             if (opinionArticles.length === 0) {
-                // Show placeholder if no opinion articles
+                // Show sample opinion articles when no real data exists
                 grid.innerHTML = `
-                    <div class="opinion-article" onclick="showToast('لا توجد مقالات رأي حالياً - أضف مقالات من لوحة التحكم', 'error')">
-                        <img class="opinion-author-img" src="https://ui-avatars.com/api/?name=كاتب&background=C9A227&color=fff&size=150" alt="كاتب">
+                    <div class="opinion-article" onclick="window.location.href='opinion.html'">
+                        <img class="opinion-author-img" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face" alt="د. أحمد محمود">
                         <div class="opinion-content">
-                            <div class="opinion-author-name"><i class="fas fa-pen-nib"></i> كاتب الرأي</div>
-                            <h3 class="opinion-title">قريباً - مقالات الرأي من كتابنا المميزين</h3>
-                            <p class="opinion-excerpt">ترقبوا مقالات حصرية من نخبة الكتاب والمحللين في مختلف المجالات السياسية والاقتصادية والاجتماعية. يمكنك إضافة مقالات رأي من لوحة التحكم عن طريق اختيار تصنيف "مقالات الرأي".</p>
-                            <div class="opinion-date"><i class="far fa-clock"></i> قريباً</div>
+                            <div class="opinion-author-name"><i class="fas fa-pen-nib"></i> د. أحمد محمود</div>
+                            <h3 class="opinion-title">مستقبل التكنولوجيا في العالم العربي</h3>
+                            <p class="opinion-excerpt">نظرة شاملة على التطورات التكنولوجيا المتوقعة في المنطقة العربية والفرص المتاحة للنمو الرقمي والابتكار التقني.</p>
+                            <div class="opinion-date"><i class="far fa-clock"></i> منذ 3 ساعات</div>
                         </div>
                     </div>
-                    <div class="opinion-article" onclick="showToast('لا توجد مقالات رأي حالياً - أضف مقالات من لوحة التحكم', 'error')">
-                        <img class="opinion-author-img" src="https://ui-avatars.com/api/?name=محلل&background=1a1a2e&color=fff&size=150" alt="محلل">
+                    <div class="opinion-article" onclick="window.location.href='opinion.html'">
+                        <img class="opinion-author-img" src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face" alt="أ. فاطمة الزهراء">
                         <div class="opinion-content">
-                            <div class="opinion-author-name"><i class="fas fa-pen-nib"></i> محلل سياسي</div>
-                            <h3 class="opinion-title">تحليلات معمقة للأحداث الجارية</h3>
-                            <p class="opinion-excerpt">نقدم لكم تحليلات عميقة ومتوازنة للأحداث السياسية والاقتصادية من خبراء ومحللين متخصصين.</p>
-                            <div class="opinion-date"><i class="far fa-clock"></i> قريباً</div>
+                            <div class="opinion-author-name"><i class="fas fa-pen-nib"></i> أ. فاطمة الزهراء</div>
+                            <h3 class="opinion-title">التعليم الرقمي والتحديات المعاصرة</h3>
+                            <p class="opinion-excerpt">استكشاف الفرص والتحديات في التعليم الرقمي، وكيفية تطوير منصات تعليمية فعالة تواكب متطلبات العصر الحديث.</p>
+                            <div class="opinion-date"><i class="far fa-clock"></i> منذ 5 ساعات</div>
+                        </div>
+                    </div>
+                    <div class="opinion-article" onclick="window.location.href='opinion.html'">
+                        <img class="opinion-author-img" src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face" alt="د. محمد السعيد">
+                        <div class="opinion-content">
+                            <div class="opinion-author-name"><i class="fas fa-pen-nib"></i> د. محمد السعيد</div>
+                            <h3 class="opinion-title">الاقتصاد الأخضر ومستقبل الطاقة</h3>
+                            <p class="opinion-excerpt">تحليل معمق لأهمية الاقتصاد الأخضر والطاقة المتجددة في بناء مستقبل مستدام، والدور العربي في هذا التحول الجذري.</p>
+                            <div class="opinion-date"><i class="far fa-clock"></i> منذ 8 ساعات</div>
                         </div>
                     </div>
                 `;
