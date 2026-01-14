@@ -7,6 +7,8 @@
     <title>حورس نيوز - مقالات الرأي</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;600;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Supabase -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         :root {
@@ -540,7 +542,61 @@
     </footer>
 
     <script>
-        // Sample opinion articles data
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://qtmdbrvrjdcxkmserlto.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0bWRicnZyamRjeGttc2VybHRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgyNTYzNTgsImV4cCI6MjA4MzgzMjM1OH0.AMsYTEy5Bo_9bcz1YDmeav1Q9qQGLxZBD26KSheAn78';
+
+        // Initialize Supabase Client
+        let supabaseClient = null;
+
+        async function initSupabase() {
+            const { createClient } = window.supabase;
+            supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase Initialized');
+        }
+
+        // Fetch opinions from Supabase
+        async function fetchOpinionsFromSupabase() {
+            if (!supabaseClient) await initSupabase();
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('news')
+                    .select('*')
+                    .eq('category', 'opinion')
+                    .eq('is_published', true)
+                    .order('created_at', { ascending: false });
+
+                if (error) {
+                    console.error('❌ Error fetching opinions from Supabase:', error);
+                    return sampleOpinions;
+                }
+
+                if (data && data.length > 0) {
+                    // Convert Supabase data to our format
+                    return data.map(item => ({
+                        id: item.id,
+                        title: item.title,
+                        summary: item.summary,
+                        author: item.author || 'كاتب الرأي',
+                        authorTitle: 'كاتب ومحلل',
+                        authorAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(item.author || 'كاتب')}&background=C9A227&color=fff&size=80`,
+                        date: item.created_at,
+                        views: item.views || 0,
+                        comments: item.comments || 0,
+                        category: item.category,
+                        content: item.content
+                    }));
+                }
+
+                return sampleOpinions;
+            } catch (error) {
+                console.error('❌ Error:', error);
+                return sampleOpinions;
+            }
+        }
+
+        // Sample opinion articles data (fallback)
         const sampleOpinions = [
             {
                 id: 1,
@@ -552,7 +608,8 @@
                 date: "2024-01-15",
                 views: 1250,
                 comments: 24,
-                category: "opinion"
+                category: "opinion",
+                content: "هذا محتوى كامل للمقال..."
             },
             {
                 id: 2,
@@ -667,25 +724,27 @@
             `;
         }
 
+        let opinions = [];
+
         // Function to load opinions
-        function loadOpinions() {
+        async function loadOpinions() {
             const loadingElement = document.getElementById('loading');
             const containerElement = document.getElementById('opinions-container');
             const emptyStateElement = document.getElementById('empty-state');
 
-            // Simulate loading time
-            setTimeout(() => {
-                loadingElement.style.display = 'none';
-                
-                if (sampleOpinions.length > 0) {
-                    // Show opinions
-                    containerElement.innerHTML = sampleOpinions.map(createOpinionCard).join('');
-                    containerElement.style.display = 'grid';
-                } else {
-                    // Show empty state
-                    emptyStateElement.style.display = 'block';
-                }
-            }, 1500);
+            // Fetch opinions from Supabase
+            opinions = await fetchOpinionsFromSupabase();
+
+            loadingElement.style.display = 'none';
+
+            if (opinions.length > 0) {
+                // Show opinions
+                containerElement.innerHTML = opinions.map(createOpinionCard).join('');
+                containerElement.style.display = 'grid';
+            } else {
+                // Show empty state
+                emptyStateElement.style.display = 'block';
+            }
         }
 
         // Function to view opinion
@@ -695,8 +754,12 @@
         }
 
         // Function to display single opinion article
-        function displaySingleOpinion(opinionId) {
-            const opinion = sampleOpinions.find(o => o.id === parseInt(opinionId));
+        async function displaySingleOpinion(opinionId) {
+            if (opinions.length === 0) {
+                opinions = await fetchOpinionsFromSupabase();
+            }
+
+            const opinion = opinions.find(o => o.id === parseInt(opinionId));
             if (!opinion) {
                 document.getElementById('opinions-container').innerHTML = `
                     <div class="empty-state">
@@ -735,8 +798,8 @@
                     <div class="opinion-content">
                         <p class="opinion-full-summary">${opinion.summary}</p>
                         <div class="opinion-full-content">
-                            <p>هذا المحتوى التفصيلي لمقال الرأي. يمكن أن يحتوي على تحليلات معمقة وأراء موضوعية حول القضايا المختلفة في المجتمع العربي والعالم.</p>
-                            <p>الرأي المنشور هنا هو رأي الكاتب الشخصي ولا يعبر بالضرورة عن رأي المنصة.</p>
+                            ${opinion.content || `<p>هذا المحتوى التفصيلي لمقال الرأي. يمكن أن يحتوي على تحليلات معمقة وأراء موضوعية حول القضايا المختلفة في المجتمع العربي والعالم.</p>
+                            <p>الرأي المنشور هنا هو رأي الكاتب الشخصي ولا يعبر بالضرورة عن رأي المنصة.</p>`}
                         </div>
                     </div>
                     <div class="opinion-stats-bar">
@@ -845,17 +908,19 @@
         }
 
         // Load opinions when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initSupabase();
+
             // Check if there's an opinion ID in the URL
             const urlParams = new URLSearchParams(window.location.search);
             const opinionId = urlParams.get('id');
 
             if (opinionId) {
                 // Display single opinion article
-                displaySingleOpinion(opinionId);
+                await displaySingleOpinion(opinionId);
             } else {
                 // Load opinions grid
-                loadOpinions();
+                await loadOpinions();
             }
         });
 
