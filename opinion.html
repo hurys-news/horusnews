@@ -793,7 +793,10 @@
                                 <p class="opinion-date"><i class="far fa-calendar-alt"></i> ${formatArabicDate(opinion.date)}</p>
                             </div>
                         </div>
-                        <h1 class="opinion-article-title">${opinion.title}</h1>
+                        <div class="title-with-avatar">
+                            <h1 class="opinion-article-title">${opinion.title}</h1>
+                            <img src="${opinion.authorAvatar}" alt="${opinion.author}" class="title-author-avatar">
+                        </div>
                     </div>
                     <div class="opinion-content">
                         <p class="opinion-full-summary">${opinion.summary}</p>
@@ -899,6 +902,21 @@
                 }
                 .back-to-opinions:hover {
                     color: var(--primary-dark);
+                }
+                .title-with-avatar {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 15px;
+                    margin-top: 20px;
+                }
+                .title-author-avatar {
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid var(--primary);
+                    box-shadow: 0 2px 8px rgba(201, 162, 39, 0.15);
                 }
             `;
             document.head.appendChild(style);
