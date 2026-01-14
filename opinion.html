@@ -555,6 +555,30 @@
             console.log('Supabase Initialized');
         }
 
+        // Increment views in Supabase
+        async function incrementViewsInSupabase(id) {
+            if (!supabaseClient) await initSupabase();
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('news')
+                    .select('views')
+                    .eq('id', id)
+                    .single();
+
+                if (data) {
+                    const newViews = (data.views || 0) + 1;
+                    await supabaseClient
+                        .from('news')
+                        .update({ views: newViews })
+                        .eq('id', id);
+                    console.log('Views incremented for opinion ' + id);
+                }
+            } catch (error) {
+                console.error('❌ Error incrementing views:', error);
+            }
+        }
+
         // Fetch opinions from Supabase
         async function fetchOpinionsFromSupabase() {
             if (!supabaseClient) await initSupabase();
@@ -931,6 +955,8 @@
             const opinionId = urlParams.get('id');
 
             if (opinionId) {
+                // Increment views for this opinion
+                await incrementViewsInSupabase(parseInt(opinionId));
                 // Display single opinion article
                 await displaySingleOpinion(opinionId);
             } else {

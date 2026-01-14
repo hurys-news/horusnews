@@ -1345,7 +1345,7 @@
             
             grid.innerHTML = opinionArticles.map(n => `
                 <div class="opinion-article" onclick="openArticle(${n.id})">
-                    <img class="opinion-author-img" src="https://ui-avatars.com/api/?name=${encodeURIComponent(n.author || 'كاتب')}&background=C9A227&color=fff&size=150" alt="${n.author}">
+                    <img class="opinion-author-img" src="${n.author_image || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(n.author || 'كاتب')}`}" alt="${n.author}">
                     <div class="opinion-content">
                         <div class="opinion-author-name"><i class="fas fa-pen-nib"></i> ${n.author || 'كاتب الرأي'}</div>
                         <h3 class="opinion-title">${n.title}</h3>

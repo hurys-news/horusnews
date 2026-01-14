@@ -840,6 +840,7 @@
                         category: newsData.category,
                         image_url: newsData.image,
                         author: newsData.author || 'فريق التحرير',
+                        author_image: newsData.author_image || null,
                         is_breaking: newsData.isBreaking || false,
                         is_featured: newsData.isFeatured || false,
                         is_published: newsData.isPublished !== false,
@@ -861,7 +862,7 @@
         // Update news in Supabase
         async function updateNewsInSupabase(id, newsData) {
             if (!supabaseClient) await initSupabase();
-            
+
             try {
                 const { data, error } = await supabaseClient
                     .from('news')
@@ -872,6 +873,7 @@
                         category: newsData.category,
                         image_url: newsData.image,
                         author: newsData.author || 'فريق التحرير',
+                        author_image: newsData.author_image || null,
                         is_breaking: newsData.isBreaking || false,
                         is_featured: newsData.isFeatured || false,
                         is_published: newsData.isPublished !== false
@@ -879,9 +881,9 @@
                     .eq('id', id)
                     .select()
                     .single();
-                
+
                 if (error) throw error;
-                
+
                 console.log('News updated in Supabase:', data);
                 return { success: true, data };
             } catch (error) {
@@ -1141,8 +1143,8 @@
                 const opinionCategory = categoriesData.find(c => c.id === 'opinion');
                 options = opinionCategory ? `<option value="${opinionCategory.id}">${opinionCategory.name}</option>` : '';
             } else {
-                // في الوضع العادي، إظهار جميع التصنيفات
-                options = categoriesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                // في الوضع العادي، إظهار جميع التصنيفات ما عدا مقالات الرأي
+                options = categoriesData.filter(c => c.id !== 'opinion').map(c => `<option value="${c.id}">${c.name}</option>`).join('');
             }
             document.getElementById('newsCategory').innerHTML = options;
             document.getElementById('filterCat').innerHTML = '<option value="">كل التصنيفات</option>' + categoriesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
