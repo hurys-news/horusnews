@@ -580,7 +580,7 @@
                         summary: item.summary,
                         author: item.author || 'كاتب الرأي',
                         authorTitle: 'كاتب ومحلل',
-                        authorAvatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(item.author || 'كاتب')}&background=C9A227&color=fff&size=80`,
+                        authorAvatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(item.author || 'كاتب')}&background=%23C9A227&color=%23FFFFFF`,
                         date: item.created_at,
                         views: item.views || 0,
                         comments: item.comments || 0,
