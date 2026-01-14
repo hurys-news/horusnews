@@ -1492,8 +1492,8 @@
         function openArticle(id) {
             const article = newsDatabase.find(n => n.id === id);
             if (article && article.category === 'opinion') {
-                // Redirect to article page with opinion ID
-                window.location.href = `article.html?id=${id}&type=opinion`;
+                // Redirect to opinion page
+                window.location.href = `opinion.html?id=${id}`;
             } else {
                 // Redirect to article page for news articles
                 window.location.href = `article.html?id=${id}`;
